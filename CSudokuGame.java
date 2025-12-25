@@ -4,6 +4,7 @@ import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import java.awt.Dimension;
 /*
 Author: Chibueze Benneth
 Class: Computer Science 12
@@ -86,6 +87,20 @@ class CSudokuGame{
         }
 
         mainPanel.add(gridPanel, BorderLayout.CENTER);
+
+        // Add Side Panel for Number Selection
+        JPanel sidePanel = new JPanel();
+        // sidePanel.setPreferredSize(new Dimension(300, 300));
+        sidePanel.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK));
+        JPanel numPanel = new JPanel(gl);
+        for (int i = 1; i <= 9; i++) {
+            SButton numButton = new SButton(i);
+            numPanel.add(numButton);
+        }
+        sidePanel.add(numPanel, BorderLayout.CENTER);
+        mainPanel.add(sidePanel, BorderLayout.EAST);
+
+        // Add the main panel to the frame
         frame.add(mainPanel, BorderLayout.SOUTH);
         frame.pack();
 

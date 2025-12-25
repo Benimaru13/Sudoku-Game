@@ -1,16 +1,14 @@
-import java.awt.Color;
-import java.awt.Dimension;
 import java.awt.Font;
-import javax.swing.BorderFactory;
 import javax.swing.JButton;
+import java.awt.Dimension;
 
 public class SButton extends JButton{
     // Keep the variables public
     int row;
     int col;
-    int cellNum;
     boolean boolValue;
-
+    int cellNum;
+    
     SButton(int num, boolean boolFlag) {
         this.cellNum = num;
         this.boolValue = boolFlag;
@@ -24,9 +22,16 @@ public class SButton extends JButton{
         else {
             this.setText("");
         }
-        
-        // this.addMouseListener(new SButtonMouseListener(this));
     }
+        
+    SButton(int num) {
+        this.cellNum = num;
+            this.setPreferredSize(new Dimension(75, 75));
+            this.setText(Integer.toString(num));
+            this.setFont(new Font("Verdana", Font.BOLD, 32));
+
+        // this.addMouseListener(new SButtonMouseListener(this));
+         }
     
     public int getRow() {      
         return row;
