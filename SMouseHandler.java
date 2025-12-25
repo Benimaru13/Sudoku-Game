@@ -7,35 +7,35 @@ import java.awt.event.MouseListener;
  * @author c.benneth
  */
 public class SMouseHandler implements MouseListener {
-
     CSudokuGame game;
-    public SMouseHandler(CSudokuGame game){
-        this.game = game;    
+    boolean isFilled; // Boolean that ensures that a number is only placed where empty
+
+    public SMouseHandler(CSudokuGame game, boolean isFilled) {
+        this.game = game;  
+        this.isFilled = isFilled;  
     }
 
     @Override
-    public void mouseClicked(MouseEvent me) {
-       
-    }
+    public void mouseClicked(MouseEvent me) {}
 
     @Override
-    public void mousePressed(MouseEvent me) {
-            }
+    public void mousePressed(MouseEvent me) {}
 
     @Override
     public void mouseReleased(MouseEvent me) {
         SButton button = (SButton)me.getSource();
-        int n = game.getCurrentNum();
+
+        game.selectedButton = button;
+        button.setSelectedVisual(true);
+
+        if (!isFilled) {
+            if (game.getCurrentNumber() > 0) {
+                int selectedNum = game.getCurrentNumber();
+                button.setDisplayValue(selectedNum);
+            }
+        }
         // only allow placing numbers in non-default (editable) cells
-        if (!button.cellFlag && n > 0) {
-            button.cellNum = n;
-            button.setText(Integer.toString(n));
-        }
-    // only allow placing numbers in non-default (editable) cells
-        if (!button.cellFlag && n > 0) {
-            button.cellNum = n;
-            button.setText(Integer.toString(n));
-        }
+        
     }
 
     @Override

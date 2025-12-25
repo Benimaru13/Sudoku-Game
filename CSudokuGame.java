@@ -4,7 +4,13 @@ import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+/*
 import java.awt.Dimension;
+import javax.swing.BorderFactory;
+import java.awt.Color;
+import javax.swing.JButton;
+import java.awt.Insets;
+import javax.swing.border.Border; */
 /*
 Author: Chibueze Benneth
 Class: Computer Science 12
@@ -13,38 +19,58 @@ Description: This is a simple Java created Sudoku Game using Swing for GUI.
 */
 
 class CSudokuGame{
+     SButton selectedButton = null;
+        int currentNumber = 0;
+        private SButton selectedNumberButton = null; // for highlighting the number button
+
+       /* JButton removeBtn;
+            // Border for selected cell
+ 
+        
+         // "Remove #" button (right)
+        removeBtn = new JButton("Remove #");
+        removeBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
+        // Let the button size itself to the text + margins
+        removeBtn.setMargin(new Insets(8, 12, 8, 12));
+        removeBtn.setOpaque(true);
+        removeBtn.setFocusPainted(false);
+        removeBtn.setBorder(BorderFactory.createLineBorder(Color.decode("#8D6E63"), 2));
+        */
 
     public CSudokuGame() {
         // Variables
         int rows = 3;
         int cols = 3;
+       
+
+
 
         // Main Sudoku Arrays
         // Initialize a 9 x 9 array of numbers for the Sudoku grid
         int [][] intArr = {
-            {7, 4, 1, 8, 9, 5, 3, 6, 2},
-            {2, 5, 8, 6, 3, 4, 7, 9, 1},
-            {3, 9, 6, 1, 7, 2, 4, 5, 8},
-            {1, 6, 4, 3, 8, 9, 5, 2, 7},
-            {9, 2, 7, 4, 5, 1, 6, 8, 3},
-            {8, 3, 5, 7, 2, 6, 1, 4, 9},
-            {5, 1, 2, 9, 6, 7, 8, 3, 4},
-            {6, 7, 3, 2, 4, 8, 9, 1, 5},
-            {4, 8, 9, 5 ,1, 3, 2, 7, 6}                 
+            {1, 7, 2, 5, 8, 4, 3, 6, 9}, 
+            {9, 3, 5, 6, 2, 7, 8, 1, 4},
+            {8, 6, 4, 1, 3, 9, 5, 7, 2},
+            {7, 2, 1, 4, 6, 3, 9, 5, 8},
+            {3, 5, 6, 7, 9, 8, 4, 2, 1},
+            {4, 8, 9, 2, 5, 1, 6, 3, 7},
+            {5, 9, 7, 8, 1, 6, 2, 4, 3},
+            {2, 1, 3, 9, 4, 5, 7, 8, 6},
+            {6, 4, 8, 3, 7, 2, 1, 9, 5}             
         };
 
         // Initialize a 9 x 9 boolean array to track filled cells        
         boolean [][] boolArr = {
-            {true, true, false, false, false, false, false, false, false},
-            {false, false, false, false, true, false, false, false, true},
-            {false, false, true, false, false, false, false, false, false},
-            {false, false, false, false, false, false, false, false, false},
-            {false, true, false, false, true, false, false, false, false},
-            {false, false, false, false, false, true, false, true, false},
-            {false, false, false, false, false, false, false, false, false},
-            {false, true, false, false, true, false, false, false, false},
-            {false, false, false, false, false, false, false, false, true},       
-        };   
+                    {true, true, true, true, true, true, false, false, false},          
+                    {false, false, true, false, false, false, true, false, true},
+                    {false, false, true, false, false, false, false, false, false},
+                    {false, true, true, false, true, true, false, false, false},
+                    {true, true, false, false, false, false, false, true, false},
+                    {false, false, false, true, false, true, false, true, true},
+                    {false, false, false, false, false, true, false, true, false},
+                    {true, false, true, true, true, false, false, true, false},
+                    {false, true, false, false, true, true, false, false, true},       
+                }; 
 
 
         // Initialize the main frame
@@ -95,10 +121,21 @@ class CSudokuGame{
         JPanel numPanel = new JPanel(gl);
         for (int i = 1; i <= 9; i++) {
             SButton numButton = new SButton(i);
+            final int selectedNum = i; // for use in lambda
+            numButton.addActionListener(e -> {
+            currentNumber = selectedNum;
+        // optional: highlight selected number button
+        if (selectedNumberButton != null && selectedNumberButton != numButton) {
+            selectedNumberButton.setSelectedVisual(false);
+        }
+        selectedNumberButton = numButton;
+        numButton.setSelectedVisual(true);
+    });
             numPanel.add(numButton);
         }
         sidePanel.add(numPanel, BorderLayout.CENTER);
         mainPanel.add(sidePanel, BorderLayout.EAST);
+        
 
         // Add the main panel to the frame
         frame.add(mainPanel, BorderLayout.SOUTH);
@@ -106,6 +143,11 @@ class CSudokuGame{
 
 
     }
+        
+    // Getter for the current number selected by the user
+    public int getCurrentNumber() {
+            return currentNumber;
+        }
 
     public static void main(String[] args) {
         CSudokuGame game = new CSudokuGame();

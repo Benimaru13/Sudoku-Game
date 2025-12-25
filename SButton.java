@@ -1,6 +1,9 @@
 import java.awt.Font;
 import javax.swing.JButton;
 import java.awt.Dimension;
+import javax.swing.BorderFactory;
+import java.awt.Color;
+import javax.swing.border.Border;
 
 public class SButton extends JButton{
     // Keep the variables public
@@ -8,8 +11,11 @@ public class SButton extends JButton{
     int col;
     boolean boolValue;
     int cellNum;
-    
-    SButton(int num, boolean boolFlag) {
+    int displayValue;
+    final Border SELECTED_BORDER = BorderFactory.createLineBorder(Color.BLUE, 3);
+    final Border defaultBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
+
+    public SButton(int num, boolean boolFlag) {
         this.cellNum = num;
         this.boolValue = boolFlag;
 
@@ -28,11 +34,28 @@ public class SButton extends JButton{
         this.cellNum = num;
             this.setPreferredSize(new Dimension(75, 75));
             this.setText(Integer.toString(num));
-            this.setFont(new Font("Verdana", Font.BOLD, 32));
+            this.setFont(new Font("Verdana", Font.ITALIC, 32));
 
         // this.addMouseListener(new SButtonMouseListener(this));
          }
     
+    // Update the value shown on this cell (only used for non-given cells)
+    public void setDisplayValue(int value) {
+            this.displayValue = value;
+            this.setText(value > 0 ? Integer.toString(value) : "");
+            // this.setForeground(TEXT_USER);
+        }
+        
+    // Visual cue for which cell is currently selected
+    public void setSelectedVisual(boolean selected) {
+            if (selected) {
+                this.setBorder(SELECTED_BORDER);
+            } else {
+                this.setBorder(defaultBorder);
+            }
+        }
+    
+
     public int getRow() {      
         return row;
     }
