@@ -12,7 +12,7 @@ public class SButton extends JButton{
     boolean boolValue;
     int cellNum;
     int displayValue;
-    final Border SELECTED_BORDER = BorderFactory.createLineBorder(Color.BLUE, 3);
+    final Border selectedBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
     final Border defaultBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
 
     public SButton(int num, boolean boolFlag) {
@@ -43,13 +43,15 @@ public class SButton extends JButton{
     public void setDisplayValue(int value) {
             this.displayValue = value;
             this.setText(value > 0 ? Integer.toString(value) : "");
+            System.out.println("Set cell to " + value);
+            this.setFont(new Font("Verdana", Font.BOLDOLD, 32));
             // this.setForeground(TEXT_USER);
         }
         
     // Visual cue for which cell is currently selected
     public void setSelectedVisual(boolean selected) {
             if (selected) {
-                this.setBorder(SELECTED_BORDER);
+                this.setBorder(selectedBorder);
             } else {
                 this.setBorder(defaultBorder);
             }

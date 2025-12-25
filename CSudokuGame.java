@@ -4,10 +4,12 @@ import java.awt.GridLayout;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-/*
-import java.awt.Dimension;
 import javax.swing.BorderFactory;
 import java.awt.Color;
+/*
+import java.awt.Dimension;
+
+
 import javax.swing.JButton;
 import java.awt.Insets;
 import javax.swing.border.Border; */
@@ -22,6 +24,8 @@ class CSudokuGame{
      SButton selectedButton = null;
         int currentNumber = 0;
         private SButton selectedNumberButton = null; // for highlighting the number button
+        SButton[][] buttons = new SButton[9][9];
+
 
        /* JButton removeBtn;
             // Border for selected cell
@@ -97,15 +101,17 @@ class CSudokuGame{
             for (int gridcol = 0; gridcol < 3; gridcol++) {
                 // For each cell in the main grid, create a sub-panel with a 3x3 layout
                 JPanel subPanel = new JPanel(gl);
-                subPanel.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK));   
+                subPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));   
                 for (int r = 0; r < 3; r++) {
                     for (int c = 0; c < 3; c++) {
                         int rowIndex = gridrow * 3 + r;
                         int colIndex = gridcol * 3 + c;
-                        SButton button = new SButton(intArr[rowIndex][colIndex], boolArr[rowIndex][colIndex]);
-                        subPanel.add(button);
+                        final boolean isFilled = boolArr[rowIndex][colIndex]; // for use in mouse listener
+                        SButton button = new SButton(intArr[rowIndex][colIndex], isFilled);
+                        buttons[rowIndex][colIndex] = button;
+                        button.addMouseListener(new SMouseHandler(this, isFilled));
+                        subPanel.add(button);                        
 
-                        
                     }
                 }
                 gridPanel.add(subPanel);
@@ -117,20 +123,24 @@ class CSudokuGame{
         // Add Side Panel for Number Selection
         JPanel sidePanel = new JPanel();
         // sidePanel.setPreferredSize(new Dimension(300, 300));
-        sidePanel.setBorder(javax.swing.BorderFactory.createLineBorder(java.awt.Color.BLACK));
+        sidePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
         JPanel numPanel = new JPanel(gl);
+        // Add the numbers 1-9 as buttons
         for (int i = 1; i <= 9; i++) {
             SButton numButton = new SButton(i);
             final int selectedNum = i; // for use in lambda
+
+            
             numButton.addActionListener(e -> {
             currentNumber = selectedNum;
+            setSelectedNumberButton(numButton);
         // optional: highlight selected number button
         if (selectedNumberButton != null && selectedNumberButton != numButton) {
             selectedNumberButton.setSelectedVisual(false);
         }
         selectedNumberButton = numButton;
         numButton.setSelectedVisual(true);
-    });
+    }); 
             numPanel.add(numButton);
         }
         sidePanel.add(numPanel, BorderLayout.CENTER);
@@ -148,6 +158,14 @@ class CSudokuGame{
     public int getCurrentNumber() {
             return currentNumber;
         }
+
+    // Setter for the selected number button (for visual highlighting)
+    public void setSelectedNumberButton(SButton btn) {
+    if (selectedNumberButton != null) selectedNumberButton.setSelectedVisual(false);
+    selectedNumberButton = btn;
+    if (btn != null) btn.setSelectedVisual(true);
+}
+
 
     public static void main(String[] args) {
         CSudokuGame game = new CSudokuGame();

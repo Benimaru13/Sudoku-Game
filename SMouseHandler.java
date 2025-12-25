@@ -31,7 +31,7 @@ public class SMouseHandler implements MouseListener {
         if (!isFilled) {
             if (game.getCurrentNumber() > 0) {
                 int selectedNum = game.getCurrentNumber();
-                button.setDisplayValue(selectedNum);
+                if (selectedNum > 0) button.setDisplayValue(selectedNum);
             }
         }
         // only allow placing numbers in non-default (editable) cells
