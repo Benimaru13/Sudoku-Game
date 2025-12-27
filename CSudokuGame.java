@@ -1,13 +1,7 @@
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.GridLayout;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.BorderFactory;
-import java.awt.Color;
+import java.awt.*;
+import javax.swing.*;
 import javax.swing.border.Border;
-import javax.swing.JButton;
+import java.awt.event.*;
 
 /*
 Author: Chibueze Benneth
@@ -32,8 +26,8 @@ class CSudokuGame{
 
     public static final Color GRID_BORDER    = Color.decode("#7A4ECF");   // medium purple
 
-    public static final Color PAD_BTN_BG     = Color.decode("#B388FF");   // button default
-    public static final Color PAD_BTN_BG_SEL = Color.decode("#7C4DFF");   // selected button
+    public static final Color PAD_BTN_BG     = Color.decode("#B388FF");   // num button default
+    public static final Color PAD_BTN_BG_SEL = Color.decode("#7C4DFF");   // selected num button
     public static final Color PAD_BTN_FG     = Color.WHITE;               // text on buttons
     
     public static final Color TEXT_GIVEN     = Color.decode("#4A2C82");   // darker purple
@@ -103,7 +97,7 @@ class CSudokuGame{
         messagePanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, TITLE_BORDER));
 
         messagePanel.add(titleMessage, BorderLayout.NORTH);
-        Font messageFont = new Font("Arial", Font.BOLD, 16);
+        Font messageFont = new Font("Roboto", Font.BOLD, 30);
         titleMessage.setFont(messageFont);
         frame.add(messagePanel, BorderLayout.NORTH);
 
@@ -145,6 +139,8 @@ class CSudokuGame{
         JPanel sidePanel = new JPanel();
         sidePanel.setBackground(BG_MAIN);
         sidePanel.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+
+
         JPanel numPanel = new JPanel(gl);
         // Add the numbers 1-9 as buttons
         for (int i = 1; i <= 9; i++) {
@@ -159,18 +155,23 @@ class CSudokuGame{
         // Highlight the selected number button
         if (selectedNumberButton != null && selectedNumberButton != numButton) {
             selectedNumberButton.setSelectedVisual(false);
+            selectedNumberButton.setBackground(PAD_BTN_BG);
         }
         selectedNumberButton = numButton;
         numButton.setSelectedVisual(true);
+        numButton.setBackground(PAD_BTN_BG_SEL);
     }); 
-        numPanel.add(numButton);
+            
+        numPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+        
         // Design features for Number Pad
         numButton.setBackground(PAD_BTN_BG);
         numButton.setForeground(PAD_BTN_FG);
         numButton.setOpaque(true);
         numButton.setFocusPainted(false);
         numButton.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
-        }
+        numPanel.add(numButton);
+    }
 
 
         // Implement "Erase" button functionality
@@ -223,11 +224,15 @@ class CSudokuGame{
         // remove highlight from previous one
         if (selectedButton != null && selectedButton != btn) {
             selectedButton.setSelectedVisual(false);
+            selectedButton.setBackground(BG_CELL);
+            selectedButton.setForeground(TEXT_USER);
             }
 
         // highlight new cell
         selectedButton = btn;
         btn.setSelectedVisual(true);
+        btn.setBackground(PAD_BTN_BG_SEL);
+        btn.setForeground(PAD_BTN_FG);
     }
 
     public void checkMove(int row, int col, int value) {

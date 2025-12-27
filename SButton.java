@@ -2,6 +2,8 @@ import java.awt.Font;
 import javax.swing.JButton;
 import java.awt.Dimension;
 import java.awt.Color;
+import java.awt.event.*;
+
 
 
 public class SButton extends JButton{
@@ -40,13 +42,15 @@ public class SButton extends JButton{
         }
     }
         
+    // Constructor for number pad buttons
     SButton(int num) {
         this.cellNum = num;
             this.setPreferredSize(new Dimension(75, 75));
             this.setText(Integer.toString(num));
             this.setFont(new Font("Verdana", Font.ITALIC, 32));
-
-        // this.addMouseListener(new SButtonMouseListener(this));
+            this.setBackground(CSudokuGame.PAD_BTN_BG);
+            this.setForeground(CSudokuGame.PAD_BTN_FG);
+            this.setOpaque(true);
          }
     
     // Update the value shown on this cell (only used for non-given cells)
@@ -63,11 +67,9 @@ public class SButton extends JButton{
     
             if (selected) {
                 this.setBorder(CSudokuGame.selectedBorder);
-                this.setBackground(CSudokuGame.PAD_BTN_BG_SEL);
 
             } else {
                 this.setBorder(CSudokuGame.defaultBorder);
-                this.setBackground(CSudokuGame.BG_CELL);
             }
         }
     
@@ -79,5 +81,7 @@ public class SButton extends JButton{
     public int getCol() {
         return col;
     }
+
+
 
 }
