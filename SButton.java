@@ -44,7 +44,7 @@ public class SButton extends JButton{
             this.displayValue = value;
             this.setText(value > 0 ? Integer.toString(value) : "");
             System.out.println("Set cell to " + value);
-            this.setFont(new Font("Verdana", Font.BOLDOLD, 32));
+            this.setFont(new Font("Verdana", Font.BOLD, 32));
             // this.setForeground(TEXT_USER);
         }
         

@@ -24,9 +24,7 @@ public class SMouseHandler implements MouseListener {
     @Override
     public void mouseReleased(MouseEvent me) {
         SButton button = (SButton)me.getSource();
-
-        game.selectedButton = button;
-        button.setSelectedVisual(true);
+        game.setSelectedCell(button); // this selects and highlights the clicked cell
 
         if (!isFilled) {
             if (game.getCurrentNumber() > 0) {

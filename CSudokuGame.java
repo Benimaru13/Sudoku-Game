@@ -6,13 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.BorderFactory;
 import java.awt.Color;
-/*
-import java.awt.Dimension;
 
-
-import javax.swing.JButton;
-import java.awt.Insets;
-import javax.swing.border.Border; */
 /*
 Author: Chibueze Benneth
 Class: Computer Science 12
@@ -21,9 +15,9 @@ Description: This is a simple Java created Sudoku Game using Swing for GUI.
 */
 
 class CSudokuGame{
-     SButton selectedButton = null;
-        int currentNumber = 0;
-        private SButton selectedNumberButton = null; // for highlighting the number button
+     SButton selectedButton = null; // keeps track of the currently selected cell in the puzzle
+        int currentNumber = 0; // keeps track of what number the user has selected from 1 to 9
+        private SButton selectedNumberButton = null; // keeps track of the currently selected number button
         SButton[][] buttons = new SButton[9][9];
 
 
@@ -65,17 +59,19 @@ class CSudokuGame{
 
         // Initialize a 9 x 9 boolean array to track filled cells        
         boolean [][] boolArr = {
-                    {true, true, true, true, true, true, false, false, false},          
-                    {false, false, true, false, false, false, true, false, true},
-                    {false, false, true, false, false, false, false, false, false},
-                    {false, true, true, false, true, true, false, false, false},
-                    {true, true, false, false, false, false, false, true, false},
-                    {false, false, false, true, false, true, false, true, true},
-                    {false, false, false, false, false, true, false, true, false},
-                    {true, false, true, true, true, false, false, true, false},
-                    {false, true, false, false, true, true, false, false, true},       
-                }; 
+            {true, true, true, true, true, true, false, false, false},          
+            {false, false, true, false, false, false, true, false, true},
+            {false, false, true, false, false, false, false, false, false},
+            {false, true, true, false, true, true, false, false, false},
+            {true, true, false, false, false, false, false, true, false},
+            {false, false, false, true, false, true, false, true, true},
+            {false, false, false, false, false, true, false, true, false},
+            {true, false, true, true, true, false, false, true, false},
+            {false, true, false, false, true, true, false, false, true},       
+        }; 
 
+        // Print a sample CLI sudoku frame
+        printStatement(intArr, boolArr);
 
         // Initialize the main frame
         JFrame frame = new JFrame("Sudoku Game");
@@ -130,11 +126,12 @@ class CSudokuGame{
             SButton numButton = new SButton(i);
             final int selectedNum = i; // for use in lambda
 
-            
+            // feature that "listens" for number button clicks
             numButton.addActionListener(e -> {
-            currentNumber = selectedNum;
-            setSelectedNumberButton(numButton);
+            currentNumber = selectedNum; // when a number button is clicked, update currentNumber
+            setSelectedNumberButton(numButton); // set the selected number button
         // optional: highlight selected number button
+        // if a number button was selected and
         if (selectedNumberButton != null && selectedNumberButton != numButton) {
             selectedNumberButton.setSelectedVisual(false);
         }
@@ -160,12 +157,48 @@ class CSudokuGame{
         }
 
     // Setter for the selected number button (for visual highlighting)
+    
     public void setSelectedNumberButton(SButton btn) {
     if (selectedNumberButton != null) selectedNumberButton.setSelectedVisual(false);
     selectedNumberButton = btn;
     if (btn != null) btn.setSelectedVisual(true);
 }
 
+    // Setter for the selected cell in the Sudoku grid
+public void setSelectedCell(SButton btn) {
+    // remove highlight from previous one
+    if (selectedButton != null && selectedButton != btn) {
+        selectedButton.setSelectedVisual(false);
+    }
+    
+    // highlight new cell
+    selectedButton = btn;
+    btn.setSelectedVisual(true);
+}
+
+
+    public static void printStatement (int[][] intList, boolean[][] boolList) {
+        for (int row = 0; row < 9; row++) {
+            // This makes the row lines
+            for(int spc = 0; spc < 20; spc++){
+                System.out.print("_");
+            }
+            System.out.println();
+            for(int col = 0; col < 9; col++) {
+                if (boolList [row][col] == true) {
+                    int num = intList[row][col];
+                    // This makes the col lines
+                    System.out.print(" " + num);
+                }
+                else {
+                    System.out.print(" .");
+                    
+                }
+     
+            }
+            System.out.println();
+        }
+    }
 
     public static void main(String[] args) {
         CSudokuGame game = new CSudokuGame();
