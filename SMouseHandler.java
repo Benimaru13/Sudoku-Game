@@ -30,6 +30,12 @@ public class SMouseHandler implements MouseListener {
             if (game.getCurrentNumber() > 0) {
                 int selectedNum = game.getCurrentNumber();
                 if (selectedNum > 0) button.setDisplayValue(selectedNum);
+
+                // Check if the move is correct
+                game.checkMove(button.row, button.col, selectedNum);
+
+                // Check if the game is won
+                game.checkWinCondition();
             }
         }
         // only allow placing numbers in non-default (editable) cells

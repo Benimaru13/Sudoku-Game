@@ -6,6 +6,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.BorderFactory;
 import java.awt.Color;
+import javax.swing.border.Border;
 
 /*
 Author: Chibueze Benneth
@@ -15,11 +16,42 @@ Description: This is a simple Java created Sudoku Game using Swing for GUI.
 */
 
 class CSudokuGame{
-     SButton selectedButton = null; // keeps track of the currently selected cell in the puzzle
-        int currentNumber = 0; // keeps track of what number the user has selected from 1 to 9
-        private SButton selectedNumberButton = null; // keeps track of the currently selected number button
-        SButton[][] buttons = new SButton[9][9];
+    SButton selectedButton; // keeps track of the currently selected cell in the puzzle
+    int currentNumber; // keeps track of what number the user has selected from 1 to 9
+    private SButton selectedNumberButton; // keeps track of the currently selected number button
+    SButton[][] buttons = new SButton[9][9];
+    // Variables
+    final int rows = 3;
+    final int cols = 3;
+    final Border correctBorder = BorderFactory.createLineBorder(Color.GREEN, 3);
+    final Border wrongBorder = BorderFactory.createLineBorder(Color.RED, 3);
 
+    // Main Sudoku Arrays
+    // Initialize a 9 x 9 array of numbers for the Sudoku grid
+    int [][] intArr = {
+        {1, 7, 2, 5, 8, 4, 3, 6, 9}, 
+        {9, 3, 5, 6, 2, 7, 8, 1, 4},
+        {8, 6, 4, 1, 3, 9, 5, 7, 2},
+        {7, 2, 1, 4, 6, 3, 9, 5, 8},
+        {3, 5, 6, 7, 9, 8, 4, 2, 1},
+        {4, 8, 9, 2, 5, 1, 6, 3, 7},
+        {5, 9, 7, 8, 1, 6, 2, 4, 3},
+        {2, 1, 3, 9, 4, 5, 7, 8, 6},
+        {6, 4, 8, 3, 7, 2, 1, 9, 5}             
+    };
+
+    // Initialize a 9 x 9 boolean array to track filled cells        
+    boolean [][] boolArr = {
+        {true, true, true, true, true, true, false, false, false},          
+        {false, false, true, false, false, false, true, false, true},
+        {false, false, true, false, false, false, false, false, false},
+        {false, true, true, false, true, true, false, false, false},
+        {true, true, false, false, false, false, false, true, false},
+        {false, false, false, true, false, true, false, true, true},
+        {false, false, false, false, false, true, false, true, false},
+        {true, false, true, true, true, false, false, true, false},
+        {false, true, false, false, true, true, false, false, true},       
+    }; 
 
        /* JButton removeBtn;
             // Border for selected cell
@@ -36,40 +68,6 @@ class CSudokuGame{
         */
 
     public CSudokuGame() {
-        // Variables
-        int rows = 3;
-        int cols = 3;
-       
-
-
-
-        // Main Sudoku Arrays
-        // Initialize a 9 x 9 array of numbers for the Sudoku grid
-        int [][] intArr = {
-            {1, 7, 2, 5, 8, 4, 3, 6, 9}, 
-            {9, 3, 5, 6, 2, 7, 8, 1, 4},
-            {8, 6, 4, 1, 3, 9, 5, 7, 2},
-            {7, 2, 1, 4, 6, 3, 9, 5, 8},
-            {3, 5, 6, 7, 9, 8, 4, 2, 1},
-            {4, 8, 9, 2, 5, 1, 6, 3, 7},
-            {5, 9, 7, 8, 1, 6, 2, 4, 3},
-            {2, 1, 3, 9, 4, 5, 7, 8, 6},
-            {6, 4, 8, 3, 7, 2, 1, 9, 5}             
-        };
-
-        // Initialize a 9 x 9 boolean array to track filled cells        
-        boolean [][] boolArr = {
-            {true, true, true, true, true, true, false, false, false},          
-            {false, false, true, false, false, false, true, false, true},
-            {false, false, true, false, false, false, false, false, false},
-            {false, true, true, false, true, true, false, false, false},
-            {true, true, false, false, false, false, false, true, false},
-            {false, false, false, true, false, true, false, true, true},
-            {false, false, false, false, false, true, false, true, false},
-            {true, false, true, true, true, false, false, true, false},
-            {false, true, false, false, true, true, false, false, true},       
-        }; 
-
         // Print a sample CLI sudoku frame
         printStatement(intArr, boolArr);
 
@@ -85,7 +83,7 @@ class CSudokuGame{
         messagePanel.add(titleMessage, BorderLayout.NORTH);
         Font messageFont = new Font("Arial", Font.BOLD, 16);
         titleMessage.setFont(messageFont);
-        frame.add(messagePanel);
+        frame.add(messagePanel, BorderLayout.NORTH);
 
         // Initialize the main Sudoku grid panel
         GridLayout gl = new GridLayout(rows, cols);
@@ -103,7 +101,7 @@ class CSudokuGame{
                         int rowIndex = gridrow * 3 + r;
                         int colIndex = gridcol * 3 + c;
                         final boolean isFilled = boolArr[rowIndex][colIndex]; // for use in mouse listener
-                        SButton button = new SButton(intArr[rowIndex][colIndex], isFilled);
+                        SButton button = new SButton(intArr[rowIndex][colIndex], isFilled, rowIndex, colIndex);
                         buttons[rowIndex][colIndex] = button;
                         button.addMouseListener(new SMouseHandler(this, isFilled));
                         subPanel.add(button);                        
@@ -130,8 +128,8 @@ class CSudokuGame{
             numButton.addActionListener(e -> {
             currentNumber = selectedNum; // when a number button is clicked, update currentNumber
             setSelectedNumberButton(numButton); // set the selected number button
-        // optional: highlight selected number button
-        // if a number button was selected and
+       
+        // Highlight the selected number button
         if (selectedNumberButton != null && selectedNumberButton != numButton) {
             selectedNumberButton.setSelectedVisual(false);
         }
@@ -145,7 +143,7 @@ class CSudokuGame{
         
 
         // Add the main panel to the frame
-        frame.add(mainPanel, BorderLayout.SOUTH);
+        frame.add(mainPanel, BorderLayout.CENTER);
         frame.pack();
 
 
@@ -159,23 +157,47 @@ class CSudokuGame{
     // Setter for the selected number button (for visual highlighting)
     
     public void setSelectedNumberButton(SButton btn) {
-    if (selectedNumberButton != null) selectedNumberButton.setSelectedVisual(false);
-    selectedNumberButton = btn;
-    if (btn != null) btn.setSelectedVisual(true);
-}
+        if (selectedNumberButton != null) selectedNumberButton.setSelectedVisual(false);
+        selectedNumberButton = btn;
+        if (btn != null) btn.setSelectedVisual(true);
+    }
 
     // Setter for the selected cell in the Sudoku grid
-public void setSelectedCell(SButton btn) {
-    // remove highlight from previous one
-    if (selectedButton != null && selectedButton != btn) {
-        selectedButton.setSelectedVisual(false);
-    }
-    
-    // highlight new cell
-    selectedButton = btn;
-    btn.setSelectedVisual(true);
-}
+    public void setSelectedCell(SButton btn) {
+        // remove highlight from previous one
+        if (selectedButton != null && selectedButton != btn) {
+            selectedButton.setSelectedVisual(false);
+            }
 
+        // highlight new cell
+        selectedButton = btn;
+        btn.setSelectedVisual(true);
+    }
+
+    public void checkMove(int row, int col, int value) {
+        int correct = intArr[row][col];
+
+        if (value == correct) {
+            System.out.println("Correct move!"); // update this logic to highlight cell in green
+            buttons[row][col].setBorder(correctBorder);
+        } else {
+            System.out.println("Wrong move!"); // update this logic to highlight cell in red
+            buttons[row][col].setBorder(wrongBorder);
+        }
+    }
+
+    public void checkWinCondition() {
+        // Check if all cells are filled correctly
+        for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) {
+                SButton btn = buttons[r][c];
+                if (btn.displayValue != intArr[r][c]) {
+                    return; // Not yet won
+                }
+            }
+        }
+        System.out.println("Congratulations! You've completed the Sudoku puzzle!");
+    }
 
     public static void printStatement (int[][] intList, boolean[][] boolList) {
         for (int row = 0; row < 9; row++) {

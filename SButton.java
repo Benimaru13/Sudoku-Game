@@ -14,15 +14,18 @@ public class SButton extends JButton{
     int displayValue;
     final Border selectedBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
     final Border defaultBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
-
-    public SButton(int num, boolean boolFlag) {
+    
+    public SButton(int num, boolean boolFlag, int row, int col) {
+        this.setPreferredSize(new Dimension(60, 60));
+        this.row = row;
+        this.col = col;
         this.cellNum = num;
         this.boolValue = boolFlag;
 
         if (boolFlag) {
             this.setEnabled(false); //This distinguishes the defaults from the open buttons
             this.setText(Integer.toString(num));
-            this.setFont(new Font("Verdana", Font.BOLD, 32));
+            this.setFont(new Font("Verdana", Font.BOLD, 25));
 
         } 
         else {
@@ -44,7 +47,7 @@ public class SButton extends JButton{
             this.displayValue = value;
             this.setText(value > 0 ? Integer.toString(value) : "");
             System.out.println("Set cell to " + value);
-            this.setFont(new Font("Verdana", Font.BOLD, 32));
+            this.setFont(new Font("Verdana", Font.BOLD, 25));
             // this.setForeground(TEXT_USER);
         }
         
