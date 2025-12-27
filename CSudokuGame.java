@@ -7,6 +7,7 @@ import javax.swing.JPanel;
 import javax.swing.BorderFactory;
 import java.awt.Color;
 import javax.swing.border.Border;
+import javax.swing.JButton;
 
 /*
 Author: Chibueze Benneth
@@ -21,10 +22,37 @@ class CSudokuGame{
     private SButton selectedNumberButton; // keeps track of the currently selected number button
     SButton[][] buttons = new SButton[9][9];
     // Variables
+
+    // Purple themed colors
+
+    public static final Color BG_MAIN        = Color.decode("#F6F0FF");   // very light lavender
+    public static final Color BG_BOARD       = Color.decode("#EDE4FF");   // slightly darker
+    public static final Color BG_CELL        = Color.decode("#FBF8FF");   // subtle contrast
+    public static final Color BG_CELL_GIVEN  = Color.decode("#E1D7FF");   // pre-filled cells
+
+    public static final Color GRID_BORDER    = Color.decode("#7A4ECF");   // medium purple
+
+    public static final Color PAD_BTN_BG     = Color.decode("#B388FF");   // button default
+    public static final Color PAD_BTN_BG_SEL = Color.decode("#7C4DFF");   // selected button
+    public static final Color PAD_BTN_FG     = Color.WHITE;               // text on buttons
+    
+    public static final Color TEXT_GIVEN     = Color.decode("#4A2C82");   // darker purple
+    public static final Color TEXT_USER      = Color.decode("#5E35B1");   // strong purple
+    public static final Color MSG_TEXT       = Color.decode("#4A2C82");   // match text tone
+    public static final Color MSG_WIN        = Color.decode("#4CAF50");   // keep green for clarity
+    public static final Color MSG_RED        = Color.decode("#F44336");   // keep red for clarity
+
+    public static final Color TITLE_BORDER   = Color.decode("#7A4ECF");   // match grid border
+
     final int rows = 3;
     final int cols = 3;
-    final Border correctBorder = BorderFactory.createLineBorder(Color.GREEN, 3);
-    final Border wrongBorder = BorderFactory.createLineBorder(Color.RED, 3);
+
+    public static final Border correctBorder = BorderFactory.createLineBorder(MSG_WIN, 3);
+    public static final Border wrongBorder = BorderFactory.createLineBorder(MSG_RED, 3);
+    public static final Border selectedBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
+    public static final Border defaultBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
+
+
 
     // Main Sudoku Arrays
     // Initialize a 9 x 9 array of numbers for the Sudoku grid
@@ -53,22 +81,9 @@ class CSudokuGame{
         {false, true, false, false, true, true, false, false, true},       
     }; 
 
-       /* JButton removeBtn;
-            // Border for selected cell
- 
-        
-         // "Remove #" button (right)
-        removeBtn = new JButton("Remove #");
-        removeBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 20));
-        // Let the button size itself to the text + margins
-        removeBtn.setMargin(new Insets(8, 12, 8, 12));
-        removeBtn.setOpaque(true);
-        removeBtn.setFocusPainted(false);
-        removeBtn.setBorder(BorderFactory.createLineBorder(Color.decode("#8D6E63"), 2));
-        */
 
     public CSudokuGame() {
-        // Print a sample CLI sudoku frame
+        // Debug feature; Print a sample CLI sudoku frame
         printStatement(intArr, boolArr);
 
         // Initialize the main frame
@@ -76,10 +91,17 @@ class CSudokuGame{
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400); // Temporary size
         frame.setVisible(true);
+        frame.getContentPane().setBackground(BG_MAIN);
 
         // Initialize the message panel
         JPanel messagePanel = new JPanel();
+        messagePanel.setBackground(BG_MAIN);
+
         JLabel titleMessage = new JLabel("Chibueze's Sudoku Game");
+        titleMessage.setForeground(MSG_TEXT);
+
+        messagePanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, TITLE_BORDER));
+
         messagePanel.add(titleMessage, BorderLayout.NORTH);
         Font messageFont = new Font("Arial", Font.BOLD, 16);
         titleMessage.setFont(messageFont);
@@ -88,14 +110,18 @@ class CSudokuGame{
         // Initialize the main Sudoku grid panel
         GridLayout gl = new GridLayout(rows, cols);
         JPanel mainPanel = new JPanel(new BorderLayout()); // This is the main panel that holds everything
+        mainPanel.setBackground(BG_MAIN);
 
         // initialize a main grid panel with a 3x3 layout
         JPanel gridPanel = new JPanel(gl); 
+        gridPanel.setBackground(BG_BOARD);
+
         for (int gridrow = 0; gridrow < 3; gridrow++) {
             for (int gridcol = 0; gridcol < 3; gridcol++) {
                 // For each cell in the main grid, create a sub-panel with a 3x3 layout
                 JPanel subPanel = new JPanel(gl);
-                subPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, 2));   
+                subPanel.setBackground(BG_BOARD);
+                subPanel.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));   
                 for (int r = 0; r < 3; r++) {
                     for (int c = 0; c < 3; c++) {
                         int rowIndex = gridrow * 3 + r;
@@ -114,10 +140,11 @@ class CSudokuGame{
 
         mainPanel.add(gridPanel, BorderLayout.CENTER);
 
+
         // Add Side Panel for Number Selection
         JPanel sidePanel = new JPanel();
-        // sidePanel.setPreferredSize(new Dimension(300, 300));
-        sidePanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        sidePanel.setBackground(BG_MAIN);
+        sidePanel.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
         JPanel numPanel = new JPanel(gl);
         // Add the numbers 1-9 as buttons
         for (int i = 1; i <= 9; i++) {
@@ -136,8 +163,37 @@ class CSudokuGame{
         selectedNumberButton = numButton;
         numButton.setSelectedVisual(true);
     }); 
-            numPanel.add(numButton);
+        numPanel.add(numButton);
+        // Design features for Number Pad
+        numButton.setBackground(PAD_BTN_BG);
+        numButton.setForeground(PAD_BTN_FG);
+        numButton.setOpaque(true);
+        numButton.setFocusPainted(false);
+        numButton.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
         }
+
+
+        // Implement "Erase" button functionality
+        JButton eraseBtn = new JButton("Erase");
+        eraseBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
+        eraseBtn.addActionListener(e -> {
+        // Remove highlight from previously selected number button
+        if (selectedButton != null) {
+            selectedButton.setSelectedVisual(false);
+            selectedButton.setDisplayValue(0); // Clear the cell display
+            selectedButton = null; // Deselect the cell
+        }
+
+            System.out.println("Erase mode: no number selected.");
+        });
+        eraseBtn.setBackground(PAD_BTN_BG);
+        eraseBtn.setForeground(PAD_BTN_FG);
+        eraseBtn.setOpaque(true);
+        eraseBtn.setFocusPainted(false);
+        eraseBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+
+        sidePanel.add(eraseBtn, BorderLayout.NORTH);
+
         sidePanel.add(numPanel, BorderLayout.CENTER);
         mainPanel.add(sidePanel, BorderLayout.EAST);
         

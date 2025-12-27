@@ -1,9 +1,8 @@
 import java.awt.Font;
 import javax.swing.JButton;
 import java.awt.Dimension;
-import javax.swing.BorderFactory;
 import java.awt.Color;
-import javax.swing.border.Border;
+
 
 public class SButton extends JButton{
     // Keep the variables public
@@ -12,8 +11,7 @@ public class SButton extends JButton{
     boolean boolValue;
     int cellNum;
     int displayValue;
-    final Border selectedBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
-    final Border defaultBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
+
     
     public SButton(int num, boolean boolFlag, int row, int col) {
         this.setPreferredSize(new Dimension(60, 60));
@@ -26,10 +24,19 @@ public class SButton extends JButton{
             this.setEnabled(false); //This distinguishes the defaults from the open buttons
             this.setText(Integer.toString(num));
             this.setFont(new Font("Verdana", Font.BOLD, 25));
+            this.setBackground(CSudokuGame.BG_CELL_GIVEN);
+            this.setForeground(CSudokuGame.TEXT_GIVEN);
+            this.setOpaque(true);
+            this.setBorder(CSudokuGame.defaultBorder);
 
         } 
         else {
             this.setText("");
+            this.setBackground(CSudokuGame.BG_CELL);
+            this.setForeground(CSudokuGame.TEXT_USER);
+            this.setOpaque(true);
+            this.setBorder(CSudokuGame.defaultBorder);
+
         }
     }
         
@@ -53,10 +60,14 @@ public class SButton extends JButton{
         
     // Visual cue for which cell is currently selected
     public void setSelectedVisual(boolean selected) {
+    
             if (selected) {
-                this.setBorder(selectedBorder);
+                this.setBorder(CSudokuGame.selectedBorder);
+                this.setBackground(CSudokuGame.PAD_BTN_BG_SEL);
+
             } else {
-                this.setBorder(defaultBorder);
+                this.setBorder(CSudokuGame.defaultBorder);
+                this.setBackground(CSudokuGame.BG_CELL);
             }
         }
     
