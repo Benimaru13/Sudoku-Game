@@ -2,6 +2,7 @@ import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.event.*;
+import javax.swing.border.TitledBorder;
 
 /*
 Author: Chibueze Benneth
@@ -151,7 +152,14 @@ class CSudokuGame{
             numButton.addActionListener(e -> {
             currentNumber = selectedNum; // when a number button is clicked, update currentNumber
             setSelectedNumberButton(numButton); // set the selected number button
-       
+                
+        // reset all number buttons
+        for (Component c : numPanel.getComponents()) {
+            if (c instanceof SButton) {
+                c.setBackground(PAD_BTN_BG);
+            }
+        }        
+
         // Highlight the selected number button
         if (selectedNumberButton != null && selectedNumberButton != numButton) {
             selectedNumberButton.setSelectedVisual(false);
@@ -162,8 +170,6 @@ class CSudokuGame{
         numButton.setBackground(PAD_BTN_BG_SEL);
     }); 
             
-        numPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
-        
         // Design features for Number Pad
         numButton.setBackground(PAD_BTN_BG);
         numButton.setForeground(PAD_BTN_FG);
@@ -195,10 +201,25 @@ class CSudokuGame{
 
         sidePanel.add(eraseBtn, BorderLayout.NORTH);
 
-        sidePanel.add(numPanel, BorderLayout.CENTER);
+
+        // titled border to number pad
+        TitledBorder tBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(TITLE_BORDER, 2), "Choose a Number (from 1-9)");
+        tBorder.setTitleColor(TEXT_GIVEN);
+        numPanel.setBorder(tBorder);
+
+        // Add padding and fixed size to the number pad to prevent stretching
+        JPanel paddedNumberPadPanel = new JPanel(new GridBagLayout());
+        paddedNumberPadPanel.setBackground(BG_MAIN);
+        JPanel innerPadPanel = new JPanel(new BorderLayout());
+        innerPadPanel.setBackground(BG_MAIN);
+        innerPadPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+        innerPadPanel.add(numPanel, BorderLayout.CENTER);
+        innerPadPanel.setPreferredSize(new Dimension(270, 270));
+        paddedNumberPadPanel.add(innerPadPanel, new GridBagConstraints());
+
+        sidePanel.add(paddedNumberPadPanel, BorderLayout.SOUTH);
         mainPanel.add(sidePanel, BorderLayout.EAST);
         
-
         // Add the main panel to the frame
         frame.add(mainPanel, BorderLayout.CENTER);
         frame.pack();
