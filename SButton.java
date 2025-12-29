@@ -1,9 +1,6 @@
+import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.JButton;
-import java.awt.Dimension;
-import java.awt.Color;
-import java.awt.event.*;
-
 
 
 public class SButton extends JButton{
@@ -57,7 +54,6 @@ public class SButton extends JButton{
     public void setDisplayValue(int value) {
             this.displayValue = value;
             this.setText(value > 0 ? Integer.toString(value) : "");
-            System.out.println("Set cell to " + value);
             this.setFont(new Font("Verdana", Font.BOLD, 25));
             // this.setForeground(TEXT_USER);
         }

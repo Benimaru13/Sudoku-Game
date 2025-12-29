@@ -1,8 +1,11 @@
 import java.awt.*;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.border.Border;
-import java.awt.event.*;
 import javax.swing.border.TitledBorder;
+
+
+
 
 /*
 Author: Chibueze Benneth
@@ -16,6 +19,23 @@ class CSudokuGame{
     int currentNumber; // keeps track of what number the user has selected from 1 to 9
     private SButton selectedNumberButton; // keeps track of the currently selected number button
     SButton[][] buttons = new SButton[9][9];
+    boolean revealMode = false;
+    // Error + timer state
+    private int errorCount = 0;
+    private final JLabel errorLabel;
+    private final JLabel timerLabel;
+
+    private int secondsElapsed = 0;
+    private Timer gameTimer;
+
+    private Clip bgClip;
+    
+    final int rows = 3;
+    final int cols = 3;
+
+    private int hintsRemaining = 3; // number of hints the user can use
+    private final JLabel hintsLabel;
+
     // Variables
 
     // Purple themed colors
@@ -38,9 +58,6 @@ class CSudokuGame{
     public static final Color MSG_RED        = Color.decode("#F44336");   // keep red for clarity
 
     public static final Color TITLE_BORDER   = Color.decode("#7A4ECF");   // match grid border
-
-    final int rows = 3;
-    final int cols = 3;
 
     public static final Border correctBorder = BorderFactory.createLineBorder(MSG_WIN, 3);
     public static final Border wrongBorder = BorderFactory.createLineBorder(MSG_RED, 3);
@@ -79,7 +96,7 @@ class CSudokuGame{
 
     public CSudokuGame() {
         // Debug feature; Print a sample CLI sudoku frame
-        printStatement(intArr, boolArr);
+        // printStatement(intArr, boolArr);
 
         // Initialize the main frame
         JFrame frame = new JFrame("Sudoku Game");
@@ -96,10 +113,38 @@ class CSudokuGame{
         titleMessage.setForeground(MSG_TEXT);
 
         messagePanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, TITLE_BORDER));
-
-        messagePanel.add(titleMessage, BorderLayout.NORTH);
         Font messageFont = new Font("Roboto", Font.BOLD, 30);
         titleMessage.setFont(messageFont);
+
+        messagePanel.add(titleMessage, BorderLayout.NORTH);
+
+        // Panel for error + timer
+        JPanel statusPanel = new JPanel();
+        statusPanel.setBackground(BG_MAIN);
+        statusPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 5));
+
+        // ERROR LABEL
+        errorLabel = new JLabel("Errors: 0");
+        errorLabel.setForeground(MSG_RED);
+        errorLabel.setFont(new Font("Roboto", Font.BOLD, 16));
+        statusPanel.add(errorLabel);
+
+        // TIMER LABEL
+        timerLabel = new JLabel("Time: 0:00");
+        timerLabel.setForeground(TEXT_GIVEN);
+        timerLabel.setFont(new Font("Roboto", Font.BOLD, 16));
+        statusPanel.add(timerLabel);
+
+        // HINTS LABEL
+        hintsLabel = new JLabel("Hints Left: " + hintsRemaining);
+        hintsLabel.setForeground(TEXT_USER);
+        hintsLabel.setFont(new Font("Roboto", Font.BOLD, 16));
+        statusPanel.add(hintsLabel);
+
+
+        messagePanel.add(statusPanel, BorderLayout.SOUTH);
+
+
         frame.add(messagePanel, BorderLayout.NORTH);
 
         // Initialize the main Sudoku grid panel
@@ -201,6 +246,44 @@ class CSudokuGame{
 
         sidePanel.add(eraseBtn, BorderLayout.NORTH);
 
+        // Implement "Reveal Solution" button functionality
+        JButton revealBtn = new JButton("Reveal Solution");
+        revealBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
+        revealBtn.setBackground(PAD_BTN_BG);
+        revealBtn.setForeground(PAD_BTN_FG);
+        revealBtn.setOpaque(true);
+        revealBtn.setFocusPainted(false);
+        revealBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+
+
+        revealBtn.addActionListener(e -> {
+            revealMode = !revealMode;   // toggle on/off
+
+        if (revealMode) {
+            revealBtn.setText("Hide Solution");
+            revealSolution();
+
+            if (gameTimer != null) gameTimer.stop();
+        } 
+        
+        else {
+            revealBtn.setText("Reveal Solution");
+            hideSolution();
+        }
+    });
+
+        sidePanel.add(revealBtn, BorderLayout.CENTER);
+
+        // Implement "Hint" button functionality
+        JButton hintBtn = new JButton("Hint");
+        hintBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
+        hintBtn.setBackground(PAD_BTN_BG);
+        hintBtn.setForeground(PAD_BTN_FG);
+        hintBtn.setOpaque(true);
+        hintBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+        hintBtn.addActionListener(e -> giveHint(hintBtn));
+
+        sidePanel.add(hintBtn, BorderLayout.NORTH);
 
         // titled border to number pad
         TitledBorder tBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(TITLE_BORDER, 2), "Choose a Number (from 1-9)");
@@ -223,9 +306,55 @@ class CSudokuGame{
         // Add the main panel to the frame
         frame.add(mainPanel, BorderLayout.CENTER);
         frame.pack();
-
+        startTimer();
 
     }
+
+    //Helper functions
+    // Reveal the solution in the grid
+    public void revealSolution() {
+    for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+            SButton btn = buttons[r][c];
+            btn.setDisplayValue(intArr[r][c]);
+            btn.setForeground(TEXT_GIVEN);   // optional: make them look “solution colored”
+        }
+    }
+}
+
+    // Hide the solution and revert to user inputs
+    public void hideSolution() {
+    for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+
+            SButton btn = buttons[r][c];
+
+            if (boolArr[r][c]) {
+                // original given cell
+                btn.setDisplayValue(intArr[r][c]);
+                btn.setForeground(TEXT_GIVEN);
+            } else {
+                // user cell — show whatever user has currently entered (stored in btn.displayValue)
+                btn.setDisplayValue(0); 
+                btn.setForeground(TEXT_USER);
+            }
+        }
+    }
+}
+
+    private void startTimer() {
+        gameTimer = new Timer(1000, e -> {
+            secondsElapsed++;
+
+            int minutes = secondsElapsed / 60;
+            int seconds = secondsElapsed % 60;
+
+            timerLabel.setText(String.format("Time: %d:%02d", minutes, seconds));
+        });
+
+        gameTimer.start();
+    }
+
         
     // Getter for the current number selected by the user
     public int getCurrentNumber() {
@@ -260,11 +389,15 @@ class CSudokuGame{
         int correct = intArr[row][col];
 
         if (value == correct) {
-            System.out.println("Correct move!"); // update this logic to highlight cell in green
+            // Highlight cell in green
             buttons[row][col].setBorder(correctBorder);
         } else {
-            System.out.println("Wrong move!"); // update this logic to highlight cell in red
+           // highlight cell in red
             buttons[row][col].setBorder(wrongBorder);
+            
+            errorCount++;
+            errorLabel.setText("Errors: " + errorCount);
+
         }
     }
 
@@ -279,7 +412,66 @@ class CSudokuGame{
             }
         }
         System.out.println("Congratulations! You've completed the Sudoku puzzle!");
+    
+        if (gameTimer != null) {
+            gameTimer.stop(); // Stop the timer upon winning
+            if (bgClip != null && bgClip.isRunning()) {
+                bgClip.stop();
+            }
+        }
+
     }
+
+   public void giveHint(JButton hintBtn) {
+
+    if (hintsRemaining <= 0) {
+        System.out.println("No hints left.");
+        hintBtn.setEnabled(false);
+        return;
+    }
+
+    java.util.List<SButton> unfilledCells = new java.util.ArrayList<>();
+
+    for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+
+            // only reveal if it was NOT originally given
+            if (!boolArr[r][c]) {              
+                SButton btn = buttons[r][c];
+
+                // only reveal if it's currently wrong or empty
+                if (btn.displayValue != intArr[r][c]) {
+                    unfilledCells.add(btn);
+                }
+            }
+        }
+    }
+
+    if (unfilledCells.isEmpty()) {
+        System.out.println("Nothing left to hint!");
+        return;
+    }
+
+    // pick a random candidate
+    java.util.Random rand = new java.util.Random();
+    SButton chosenCell = unfilledCells.get(rand.nextInt(unfilledCells.size()));
+
+    // fill with correct number
+    chosenCell.setDisplayValue(intArr[chosenCell.row][chosenCell.col]);
+    chosenCell.setBorder(correctBorder);
+
+    // reduce hints
+    hintsRemaining--;
+    hintsLabel.setText("Hints remaining: " + hintsRemaining);
+
+    if (hintsRemaining == 0) {
+        hintsLabel.setText("No hints left");
+        hintBtn.setEnabled(false);
+    }
+
+    checkWinCondition();
+}
+
 
     public static void printStatement (int[][] intList, boolean[][] boolList) {
         for (int row = 0; row < 9; row++) {
@@ -304,6 +496,7 @@ class CSudokuGame{
         }
     }
 
+  
     public static void main(String[] args) {
         CSudokuGame game = new CSudokuGame();
     }
