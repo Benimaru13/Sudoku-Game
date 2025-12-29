@@ -27,6 +27,7 @@ class CSudokuGame{
 
     private int secondsElapsed = 0;
     private Timer gameTimer;
+    private boolean gameOver = false;
 
     private Clip bgClip;
     
@@ -415,12 +416,11 @@ class CSudokuGame{
     
         if (gameTimer != null) {
             gameTimer.stop(); // Stop the timer upon winning
-            if (bgClip != null && bgClip.isRunning()) {
-                bgClip.stop();
+            gameOver = true;
             }
         }
 
-    }
+    
 
    public void giveHint(JButton hintBtn) {
 
@@ -459,9 +459,13 @@ class CSudokuGame{
     // fill with correct number
     chosenCell.setDisplayValue(intArr[chosenCell.row][chosenCell.col]);
     chosenCell.setBorder(correctBorder);
+    chosenCell.setForeground(Color.decode("#4A148C"));   // optional: nice purple tone
+
+    flashCell(chosenCell, Color.decode("#39ea8eff"), 2);
 
     // reduce hints
     hintsRemaining--;
+    secondsElapsed += 30; // 30 seconds penalty
     hintsLabel.setText("Hints remaining: " + hintsRemaining);
 
     if (hintsRemaining == 0) {
@@ -470,6 +474,30 @@ class CSudokuGame{
     }
 
     checkWinCondition();
+}
+
+public void flashCell(JButton cell, Color flashColor, int flashes) {
+    final Color original = cell.getBackground();
+
+    Timer timer = new Timer(150, null);
+    final int[] count = {0};
+
+    timer.addActionListener(e -> {
+        if (count[0] % 2 == 0) {
+            cell.setBackground(flashColor);
+        } else {
+            cell.setBackground(original);
+        }
+
+        count[0]++;
+
+        if (count[0] > flashes * 2) {
+            cell.setBackground(original);
+            timer.stop();
+        }
+    });
+
+    timer.start();
 }
 
 
