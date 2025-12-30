@@ -266,6 +266,7 @@ class CSudokuGame{
         if (selectedButton != null) {
             selectedButton.setSelectedVisual(false);
             selectedButton.setDisplayValue(0); // Clear the cell display
+            selectedButton.setBackground(BG_CELL);
             selectedButton = null; // Deselect the cell
         }
 
