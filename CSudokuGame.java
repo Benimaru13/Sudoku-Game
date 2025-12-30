@@ -1,5 +1,4 @@
 import java.awt.*;
-import javax.sound.sampled.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
@@ -15,32 +14,52 @@ Description: This is a simple Java created Sudoku Game using Swing for GUI.
 */
 
 class CSudokuGame{
-    SButton selectedButton; // keeps track of the currently selected cell in the puzzle
-    int currentNumber; // keeps track of what number the user has selected from 1 to 9
-    private SButton selectedNumberButton; // keeps track of the currently selected number button
+    // Important Fields
+
+    // keeps track of the currently selected cell in the puzzle
+    SButton selectedButton; 
+
+    // keeps track of what number the user has selected from 1 to 9
+    int currentNumber; 
+
+    // keeps track of the currently selected number button in the number pad
+    private SButton selectedNumberButton; 
+
+    // 2D array to hold references to all Sudoku grid buttons
     SButton[][] buttons = new SButton[9][9];
+
+    // True when the Solution reveal button is toggled on
     boolean revealMode = false;
-    // Error + timer state
+
+
+    // Error count
     private int errorCount = 0;
+
+    // Error label
     private final JLabel errorLabel;
+
+    // Timer label
     private final JLabel timerLabel;
 
+    // Timer variables
     private int secondsElapsed = 0;
     private Timer gameTimer;
+
+    // Game over flag
     private boolean gameOver = false;
 
-    private Clip bgClip;
-    
+    // Grid dimensions
     final int rows = 3;
     final int cols = 3;
 
-    private int hintsRemaining = 3; // number of hints the user can use
+    // number of hints the user can use
+    private int hintsRemaining = 3; 
+
+    // Hints label
     private final JLabel hintsLabel;
 
-    // Variables
 
     // Purple themed colors
-
     public static final Color BG_MAIN        = Color.decode("#F6F0FF");   // very light lavender
     public static final Color BG_BOARD       = Color.decode("#EDE4FF");   // slightly darker
     public static final Color BG_CELL        = Color.decode("#FBF8FF");   // subtle contrast
@@ -60,15 +79,15 @@ class CSudokuGame{
 
     public static final Color TITLE_BORDER   = Color.decode("#7A4ECF");   // match grid border
 
+    // Border Styles
     public static final Border correctBorder = BorderFactory.createLineBorder(MSG_WIN, 3);
     public static final Border wrongBorder = BorderFactory.createLineBorder(MSG_RED, 3);
     public static final Border selectedBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
-    public static final Border defaultBorder = BorderFactory.createLineBorder(Color.BLACK, 1);
-
+    public static final Border defaultBorder = BorderFactory.createLineBorder(Color.BLACK, 1); 
 
 
     // Main Sudoku Arrays
-    // Initialize a 9 x 9 array of numbers for the Sudoku grid
+    // Sudoku solution array
     int [][] intArr = {
         {1, 7, 2, 5, 8, 4, 3, 6, 9}, 
         {9, 3, 5, 6, 2, 7, 8, 1, 4},
@@ -81,7 +100,7 @@ class CSudokuGame{
         {6, 4, 8, 3, 7, 2, 1, 9, 5}             
     };
 
-    // Initialize a 9 x 9 boolean array to track filled cells        
+    // Tracks which cells are filled (given) and which are empty (user-fillable)
     boolean [][] boolArr = {
         {true, true, true, true, true, true, false, false, false},          
         {false, false, true, false, false, false, true, false, true},
@@ -94,85 +113,94 @@ class CSudokuGame{
         {false, true, false, false, true, true, false, false, true},       
     }; 
 
+    // Debug feature: printStatement(intArr, boolArr);
 
     public CSudokuGame() {
-        // Debug feature; Print a sample CLI sudoku frame
-        // printStatement(intArr, boolArr);
 
+        // ----- Frame and Panels Setup -----
         // Initialize the main frame
-        JFrame frame = new JFrame("Sudoku Game");
+        JFrame frame = new JFrame("My Sudoku Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400); // Temporary size
         frame.setVisible(true);
         frame.getContentPane().setBackground(BG_MAIN);
 
-        // Initialize the message panel
+        // Initialize the Message Panel and the Status Panel
         JPanel messagePanel = new JPanel();
         messagePanel.setBackground(BG_MAIN);
+        messagePanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, TITLE_BORDER));
+        messagePanel.setLayout(new BorderLayout()); // This allows for top and bottom placement
 
+        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+        titlePanel.setBackground(BG_MAIN);
         JLabel titleMessage = new JLabel("Chibueze's Sudoku Game");
         titleMessage.setForeground(MSG_TEXT);
-
-        messagePanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, TITLE_BORDER));
         Font messageFont = new Font("Roboto", Font.BOLD, 30);
         titleMessage.setFont(messageFont);
+        titlePanel.add(titleMessage);
 
-        messagePanel.add(titleMessage, BorderLayout.NORTH);
-
-        // Panel for error + timer
+        messagePanel.add(titlePanel, BorderLayout.NORTH);
+                        
+        // Status Panel
         JPanel statusPanel = new JPanel();
         statusPanel.setBackground(BG_MAIN);
-        statusPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 20, 5));
+        statusPanel.setLayout(new FlowLayout(FlowLayout.CENTER, 25, 5)); // spacing between labels
 
-        // ERROR LABEL
+        // Error Label
         errorLabel = new JLabel("Errors: 0");
         errorLabel.setForeground(MSG_RED);
         errorLabel.setFont(new Font("Roboto", Font.BOLD, 16));
         statusPanel.add(errorLabel);
 
-        // TIMER LABEL
+        // Timer Label
         timerLabel = new JLabel("Time: 0:00");
         timerLabel.setForeground(TEXT_GIVEN);
         timerLabel.setFont(new Font("Roboto", Font.BOLD, 16));
         statusPanel.add(timerLabel);
 
-        // HINTS LABEL
+        // Hints Label
         hintsLabel = new JLabel("Hints Left: " + hintsRemaining);
         hintsLabel.setForeground(TEXT_USER);
         hintsLabel.setFont(new Font("Roboto", Font.BOLD, 16));
         statusPanel.add(hintsLabel);
 
-
         messagePanel.add(statusPanel, BorderLayout.SOUTH);
-
 
         frame.add(messagePanel, BorderLayout.NORTH);
 
+        // ----- MAIN GRID PANEL -----
         // Initialize the main Sudoku grid panel
         GridLayout gl = new GridLayout(rows, cols);
-        JPanel mainPanel = new JPanel(new BorderLayout()); // This is the main panel that holds everything
+        JPanel mainPanel = new JPanel(new BorderLayout()); 
         mainPanel.setBackground(BG_MAIN);
 
-        // initialize a main grid panel with a 3x3 layout
+        // initialize a main Sudoku Grid with a 3x3 layout
         JPanel gridPanel = new JPanel(gl); 
         gridPanel.setBackground(BG_BOARD);
 
         for (int gridrow = 0; gridrow < 3; gridrow++) {
             for (int gridcol = 0; gridcol < 3; gridcol++) {
-                // For each cell in the main grid, create a sub-panel with a 3x3 layout
+
+                // For each Sudoku main grid, create a sub 3x3 grid 
                 JPanel subPanel = new JPanel(gl);
                 subPanel.setBackground(BG_BOARD);
                 subPanel.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));   
+
+                // Create buttons for each cell in the 3x3 sub-grid
                 for (int r = 0; r < 3; r++) {
                     for (int c = 0; c < 3; c++) {
+
+                        // Calculate the actual row and column in the 9x9 grid
                         int rowIndex = gridrow * 3 + r;
                         int colIndex = gridcol * 3 + c;
                         final boolean isFilled = boolArr[rowIndex][colIndex]; // for use in mouse listener
+                        
+                        // Create the button with appropriate parameters
                         SButton button = new SButton(intArr[rowIndex][colIndex], isFilled, rowIndex, colIndex);
                         buttons[rowIndex][colIndex] = button;
-                        button.addMouseListener(new SMouseHandler(this, isFilled));
+                        button.addMouseListener(new SMouseHandler(this, isFilled)); // add mouse listener to handle clicks
+                        
                         subPanel.add(button);                        
-
                     }
                 }
                 gridPanel.add(subPanel);
@@ -186,20 +214,21 @@ class CSudokuGame{
         JPanel sidePanel = new JPanel();
         sidePanel.setBackground(BG_MAIN);
         sidePanel.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+        sidePanel.setLayout(new BorderLayout());
 
-
+        // Number Pad Panel
         JPanel numPanel = new JPanel(gl);
         // Add the numbers 1-9 as buttons
         for (int i = 1; i <= 9; i++) {
             SButton numButton = new SButton(i);
             final int selectedNum = i; // for use in lambda
 
-            // feature that "listens" for number button clicks
+            // Handles operations when a number button is clicked
             numButton.addActionListener(e -> {
             currentNumber = selectedNum; // when a number button is clicked, update currentNumber
             setSelectedNumberButton(numButton); // set the selected number button
                 
-        // reset all number buttons
+        // reset all number button colours
         for (Component c : numPanel.getComponents()) {
             if (c instanceof SButton) {
                 c.setBackground(PAD_BTN_BG);
@@ -225,8 +254,11 @@ class CSudokuGame{
         numPanel.add(numButton);
     }
 
+    // ----- SIDE PANEL CONTROL BUTTONS -----
+    JPanel controlPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 20, 50));
+    controlPanel.setBackground(BG_MAIN);
 
-        // Implement "Erase" button functionality
+        // Erase Button functionality
         JButton eraseBtn = new JButton("Erase");
         eraseBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
         eraseBtn.addActionListener(e -> {
@@ -245,7 +277,7 @@ class CSudokuGame{
         eraseBtn.setFocusPainted(false);
         eraseBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
 
-        sidePanel.add(eraseBtn, BorderLayout.NORTH);
+        controlPanel.add(eraseBtn);
 
         // Implement "Reveal Solution" button functionality
         JButton revealBtn = new JButton("Reveal Solution");
@@ -273,7 +305,7 @@ class CSudokuGame{
         }
     });
 
-        sidePanel.add(revealBtn, BorderLayout.CENTER);
+        controlPanel.add(revealBtn);
 
         // Implement "Hint" button functionality
         JButton hintBtn = new JButton("Hint");
@@ -284,7 +316,9 @@ class CSudokuGame{
         hintBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
         hintBtn.addActionListener(e -> giveHint(hintBtn));
 
-        sidePanel.add(hintBtn, BorderLayout.NORTH);
+        controlPanel.add(hintBtn);
+
+        sidePanel.add(controlPanel, BorderLayout.NORTH);
 
         // titled border to number pad
         TitledBorder tBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(TITLE_BORDER, 2), "Choose a Number (from 1-9)");
@@ -294,6 +328,7 @@ class CSudokuGame{
         // Add padding and fixed size to the number pad to prevent stretching
         JPanel paddedNumberPadPanel = new JPanel(new GridBagLayout());
         paddedNumberPadPanel.setBackground(BG_MAIN);
+
         JPanel innerPadPanel = new JPanel(new BorderLayout());
         innerPadPanel.setBackground(BG_MAIN);
         innerPadPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
@@ -301,7 +336,7 @@ class CSudokuGame{
         innerPadPanel.setPreferredSize(new Dimension(270, 270));
         paddedNumberPadPanel.add(innerPadPanel, new GridBagConstraints());
 
-        sidePanel.add(paddedNumberPadPanel, BorderLayout.SOUTH);
+        sidePanel.add(paddedNumberPadPanel, BorderLayout.CENTER);
         mainPanel.add(sidePanel, BorderLayout.EAST);
         
         // Add the main panel to the frame
