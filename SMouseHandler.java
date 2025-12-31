@@ -6,11 +6,11 @@ import java.awt.event.MouseListener;
  *
  * @author c.benneth
  */
-public class SMouseHandler implements MouseListener {
+class SMouseHandler implements MouseListener {
     CSudokuGame game;
     boolean isFilled; // Boolean that ensures that a number is only placed where empty
 
-    public SMouseHandler(CSudokuGame game, boolean isFilled) {
+    SMouseHandler(CSudokuGame game, boolean isFilled) {
         this.game = game;  
         this.isFilled = isFilled;  
     }

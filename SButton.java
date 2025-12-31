@@ -4,7 +4,7 @@ import javax.swing.JButton;
 
 
 public class SButton extends JButton{
-    // Keep the variables public
+    // Keep the fields public
     int row;
     int col;
     boolean boolValue;

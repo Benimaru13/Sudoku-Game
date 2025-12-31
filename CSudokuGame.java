@@ -102,7 +102,7 @@ class CSudokuGame{
 
     // Tracks which cells are filled (given) and which are empty (user-fillable)
     boolean [][] boolArr = {
-        {true, true, true, true, true, true, false, false, false},          
+        {true, true, true, false, true, true, false, false, false},          
         {false, false, true, false, false, false, true, false, true},
         {false, false, true, false, false, false, false, false, false},
         {false, true, true, false, true, true, false, false, false},
@@ -345,9 +345,18 @@ class CSudokuGame{
         frame.pack();
         startTimer();
 
+        // Load Audio Clips
+        AudioManager.load("correct", "C:\\Users\\BC-Tech\\Documents\\GitHub\\Sudoku-Game\\sounds\\correct.wav");
+        AudioManager.load("wrong",   "C:\\Users\\BC-Tech\\Documents\\GitHub\\Sudoku-Game\\sounds\\fahhh.wav");
+        AudioManager.load("clock_ticks",   "C:\\Users\\BC-Tech\\Documents\\GitHub\\Sudoku-Game\\sounds\\ticking_clocks.wav");
+        // AudioManager.load("hint",    "/sounds/hint.wav");
+        // AudioManager.load("win",     "/sounds/win.wav");
+        AudioManager.setMuted(false); // set to true to mute all sounds
+
+
     }
 
-    //Helper functions
+    // ----- HELPER FUNCTIONS -----
     // Reveal the solution in the grid
     public void revealSolution() {
     for (int r = 0; r < 9; r++) {
@@ -379,6 +388,7 @@ class CSudokuGame{
     }
 }
 
+    // Start the game timer
     private void startTimer() {
         gameTimer = new Timer(1000, e -> {
             secondsElapsed++;
@@ -390,6 +400,7 @@ class CSudokuGame{
         });
 
         gameTimer.start();
+        AudioManager.loop("clock_ticks");
     }
 
         
@@ -399,7 +410,6 @@ class CSudokuGame{
         }
 
     // Setter for the selected number button (for visual highlighting)
-    
     public void setSelectedNumberButton(SButton btn) {
         if (selectedNumberButton != null) selectedNumberButton.setSelectedVisual(false);
         selectedNumberButton = btn;
@@ -422,15 +432,18 @@ class CSudokuGame{
         btn.setForeground(PAD_BTN_FG);
     }
 
+    // Check if the user's move is correct
     public void checkMove(int row, int col, int value) {
         int correct = intArr[row][col];
 
         if (value == correct) {
             // Highlight cell in green
             buttons[row][col].setBorder(correctBorder);
+            AudioManager.play("correct");
         } else {
            // highlight cell in red
             buttons[row][col].setBorder(wrongBorder);
+            AudioManager.play("wrong");
             
             errorCount++;
             errorLabel.setText("Errors: " + errorCount);
@@ -438,6 +451,7 @@ class CSudokuGame{
         }
     }
 
+    // Check if the game is won
     public void checkWinCondition() {
         // Check if all cells are filled correctly
         for (int r = 0; r < 9; r++) {
@@ -456,8 +470,7 @@ class CSudokuGame{
             }
         }
 
-    
-
+    // Provide a hint to the user by filling in one correct cell
    public void giveHint(JButton hintBtn) {
 
     if (hintsRemaining <= 0) {
@@ -512,6 +525,8 @@ class CSudokuGame{
     checkWinCondition();
 }
 
+// ----- Animation Helper Function -----
+// Flash a cell with a specified color for a number of times
 public void flashCell(JButton cell, Color flashColor, int flashes) {
     final Color original = cell.getBackground();
 
@@ -536,31 +551,30 @@ public void flashCell(JButton cell, Color flashColor, int flashes) {
     timer.start();
 }
 
-
-    public static void printStatement (int[][] intList, boolean[][] boolList) {
-        for (int row = 0; row < 9; row++) {
-            // This makes the row lines
-            for(int spc = 0; spc < 20; spc++){
-                System.out.print("_");
-            }
-            System.out.println();
-            for(int col = 0; col < 9; col++) {
-                if (boolList [row][col] == true) {
-                    int num = intList[row][col];
-                    // This makes the col lines
-                    System.out.print(" " + num);
-                }
-                else {
-                    System.out.print(" .");
-                    
-                }
-     
-            }
-            System.out.println();
+// ----- DEBUG FUNCTION -----
+public static void printStatement (int[][] intList, boolean[][] boolList) {
+    for (int row = 0; row < 9; row++) {
+        // This makes the row lines
+        for(int spc = 0; spc < 20; spc++){
+            System.out.print("_");
         }
+        System.out.println();
+        for(int col = 0; col < 9; col++) {
+            if (boolList [row][col] == true) {
+                int num = intList[row][col];
+                // This makes the col lines
+                System.out.print(" " + num);
+            }
+            else {
+                System.out.print(" .");
+                
+            }
+    
+        }
+        System.out.println();
     }
+}
 
-  
     public static void main(String[] args) {
         CSudokuGame game = new CSudokuGame();
     }
