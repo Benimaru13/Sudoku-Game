@@ -3,9 +3,6 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-
-
-
 /*
 Author: Chibueze Benneth
 Class: Computer Science 12
@@ -15,6 +12,8 @@ Description: This is a simple Java created Sudoku Game using Swing for GUI.
 
 class CSudokuGame{
     // Important Fields
+    JLabel titleMessage;
+    JFrame frame;
 
     // keeps track of the currently selected cell in the puzzle
     SButton selectedButton; 
@@ -31,7 +30,6 @@ class CSudokuGame{
     // True when the Solution reveal button is toggled on
     boolean revealMode = false;
 
-
     // Error count
     private int errorCount = 0;
 
@@ -43,10 +41,11 @@ class CSudokuGame{
 
     // Timer variables
     private int secondsElapsed = 0;
-    private Timer gameTimer;
+    public Timer gameTimer;
 
     // Game over flag
-    private boolean gameOver = false;
+    public boolean gameWon = false;
+    public boolean gameOver = false;
 
     // Grid dimensions
     final int rows = 3;
@@ -57,6 +56,12 @@ class CSudokuGame{
 
     // Hints label
     private final JLabel hintsLabel;
+
+    // Control Buttons
+    private final JButton eraseBtn;
+    private final JButton hintBtn;
+    private final JButton NearlyCompleteBtn;
+    public final JButton revealBtn;
 
 
     // Purple themed colors
@@ -69,8 +74,8 @@ class CSudokuGame{
 
     public static final Color PAD_BTN_BG     = Color.decode("#B388FF");   // num button default
     public static final Color PAD_BTN_BG_SEL = Color.decode("#7C4DFF");   // selected num button
-    public static final Color PAD_BTN_FG     = Color.WHITE;               // text on buttons
-    
+    public static final Color PAD_BTN_FG     = GRID_BORDER;  // darker gold/bronze 
+
     public static final Color TEXT_GIVEN     = Color.decode("#4A2C82");   // darker purple
     public static final Color TEXT_USER      = Color.decode("#5E35B1");   // strong purple
     public static final Color MSG_TEXT       = Color.decode("#4A2C82");   // match text tone
@@ -100,6 +105,9 @@ class CSudokuGame{
         {6, 4, 8, 3, 7, 2, 1, 9, 5}             
     };
 
+    // Tracks which numbers have been revealed in 
+    public static int [][] revealedBtnNumbers = new int[9][9];
+
     // Tracks which cells are filled (given) and which are empty (user-fillable)
     boolean [][] boolArr = {
         {true, true, true, false, true, true, false, false, false},          
@@ -113,16 +121,28 @@ class CSudokuGame{
         {false, true, false, false, true, true, false, false, true},       
     }; 
 
+    // Nearly complete puzzle for debugging
+    boolean[][] nearlyCompleted = {
+        {true, true, true, false, true, true, false, false, false}, 
+        {true, true, true, true, true, true, true, true, true},
+        {true, true, true, true, true, true, true, true, true},
+        {true, true, true, true, true, true, true, true, true},
+        {true, true, true, true, true, true, true, true, true},
+        {true, true, true, true, true, true, true, true, true},
+        {true, true, true, true, true, true, true, true, true},
+        {true, true, true, true, true, true, true, true, true},    
+        {true, true, true, true, true, true, true, true, true}    
+    };
+
+    
     // Debug feature: printStatement(intArr, boolArr);
 
     public CSudokuGame() {
-
         // ----- Frame and Panels Setup -----
         // Initialize the main frame
         JFrame frame = new JFrame("My Sudoku Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400); // Temporary size
-        frame.setVisible(true);
         frame.getContentPane().setBackground(BG_MAIN);
 
         // Initialize the Message Panel and the Status Panel
@@ -133,8 +153,11 @@ class CSudokuGame{
 
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         titlePanel.setBackground(BG_MAIN);
-        JLabel titleMessage = new JLabel("Chibueze's Sudoku Game");
+
+        titleMessage =  new JLabel();
+        titleMessage.setText("Chibueze's Sudoku Game");
         titleMessage.setForeground(MSG_TEXT);
+
         Font messageFont = new Font("Roboto", Font.BOLD, 30);
         titleMessage.setFont(messageFont);
         titlePanel.add(titleMessage);
@@ -208,8 +231,7 @@ class CSudokuGame{
         }
 
         mainPanel.add(gridPanel, BorderLayout.CENTER);
-
-
+        
         // Add Side Panel for Number Selection
         JPanel sidePanel = new JPanel();
         sidePanel.setBackground(BG_MAIN);
@@ -259,7 +281,7 @@ class CSudokuGame{
     controlPanel.setBackground(BG_MAIN);
 
         // Erase Button functionality
-        JButton eraseBtn = new JButton("Erase");
+        eraseBtn = new JButton("Erase");
         eraseBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
         eraseBtn.addActionListener(e -> {
         // Remove highlight from previously selected number button
@@ -280,8 +302,36 @@ class CSudokuGame{
 
         controlPanel.add(eraseBtn);
 
+        // Implement "Hint" button functionality
+        hintBtn = new JButton("Hint");
+        hintBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
+        hintBtn.setBackground(PAD_BTN_BG);
+        hintBtn.setForeground(PAD_BTN_FG);
+        hintBtn.setOpaque(true);
+        hintBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+        hintBtn.addActionListener(e -> giveHint(hintBtn));
+
+        controlPanel.add(hintBtn);
+
+        sidePanel.add(controlPanel, BorderLayout.NORTH);
+
+        // Nearly Complete Button functionality (for debugging)
+        NearlyCompleteBtn = new JButton("Nearly Complete (Debug)");
+        NearlyCompleteBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
+        NearlyCompleteBtn.setBackground(PAD_BTN_BG);
+        NearlyCompleteBtn.setForeground(PAD_BTN_FG);
+        NearlyCompleteBtn.setOpaque(true);
+        NearlyCompleteBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+        
+        NearlyCompleteBtn.addActionListener(e -> {
+        // Load a nearly complete puzzle for debugging
+        loadNearlyCompletePuzzle();
+        });
+
+        controlPanel.add(NearlyCompleteBtn);
+
         // Implement "Reveal Solution" button functionality
-        JButton revealBtn = new JButton("Reveal Solution");
+        revealBtn = new JButton("Reveal Solution");
         revealBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
         revealBtn.setBackground(PAD_BTN_BG);
         revealBtn.setForeground(PAD_BTN_FG);
@@ -296,30 +346,20 @@ class CSudokuGame{
         if (revealMode) {
             revealBtn.setText("Hide Solution");
             revealSolution();
-
-            if (gameTimer != null) gameTimer.stop();
+             
+            disableAllButtons();
         } 
         
         else {
             revealBtn.setText("Reveal Solution");
             hideSolution();
+
+            reEnableAllButtons();
         }
     });
 
         controlPanel.add(revealBtn);
 
-        // Implement "Hint" button functionality
-        JButton hintBtn = new JButton("Hint");
-        hintBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
-        hintBtn.setBackground(PAD_BTN_BG);
-        hintBtn.setForeground(PAD_BTN_FG);
-        hintBtn.setOpaque(true);
-        hintBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
-        hintBtn.addActionListener(e -> giveHint(hintBtn));
-
-        controlPanel.add(hintBtn);
-
-        sidePanel.add(controlPanel, BorderLayout.NORTH);
 
         // titled border to number pad
         TitledBorder tBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(TITLE_BORDER, 2), "Choose a Number (from 1-9)");
@@ -336,23 +376,15 @@ class CSudokuGame{
         innerPadPanel.add(numPanel, BorderLayout.CENTER);
         innerPadPanel.setPreferredSize(new Dimension(270, 270));
         paddedNumberPadPanel.add(innerPadPanel, new GridBagConstraints());
-
         sidePanel.add(paddedNumberPadPanel, BorderLayout.CENTER);
         mainPanel.add(sidePanel, BorderLayout.EAST);
         
+
         // Add the main panel to the frame
         frame.add(mainPanel, BorderLayout.CENTER);
         frame.pack();
+        frame.setVisible(true);
         startTimer();
-
-        // Load Audio Clips
-        AudioManager.load("correct", "C:\\Users\\BC-Tech\\Documents\\GitHub\\Sudoku-Game\\sounds\\correct.wav");
-        AudioManager.load("wrong",   "C:\\Users\\BC-Tech\\Documents\\GitHub\\Sudoku-Game\\sounds\\fahhh.wav");
-        AudioManager.load("clock_ticks",   "C:\\Users\\BC-Tech\\Documents\\GitHub\\Sudoku-Game\\sounds\\ticking_clocks.wav");
-        // AudioManager.load("hint",    "/sounds/hint.wav");
-        // AudioManager.load("win",     "/sounds/win.wav");
-        AudioManager.setMuted(false); // set to true to mute all sounds
-
 
     }
 
@@ -363,7 +395,7 @@ class CSudokuGame{
         for (int c = 0; c < 9; c++) {
             SButton btn = buttons[r][c];
             btn.setDisplayValue(intArr[r][c]);
-            btn.setForeground(TEXT_GIVEN);   // optional: make them look “solution colored”
+            btn.setForeground(MSG_WIN);   // optional: make them look “solution colored”
         }
     }
 }
@@ -381,12 +413,31 @@ class CSudokuGame{
                 btn.setForeground(TEXT_GIVEN);
             } else {
                 // user cell — show whatever user has currently entered (stored in btn.displayValue)
-                btn.setDisplayValue(0); 
+                btn.setDisplayValue(revealedBtnNumbers[r][c]); 
                 btn.setForeground(TEXT_USER);
+                }
             }
         }
     }
-}
+
+    // Load a nearly complete puzzle for debugging
+    public void loadNearlyCompletePuzzle() {
+        for (int row = 0; row < 9; row++) {
+            for (int col = 0; col < 9; col++) {
+                boolArr[row][col] = nearlyCompleted[row][col];
+                SButton btn = buttons[row][col];
+
+                if (boolArr[row][col]) {
+                    btn.setDisplayValue(intArr[row][col]);
+                    btn.setForeground(TEXT_GIVEN);
+                } else {
+                    btn.setDisplayValue(0);
+                    btn.setForeground(TEXT_USER);
+                }
+            }
+        }
+    }
+
 
     // Start the game timer
     private void startTimer() {
@@ -448,27 +499,57 @@ class CSudokuGame{
             errorCount++;
             errorLabel.setText("Errors: " + errorCount);
 
+            if (errorCount >= 3) {
+                gameOver = true;                
+            }
+        }
+    }
+
+    // Disable all buttons (used when game is Won)
+    public void disableAllButtons() {
+        eraseBtn.setEnabled(false);
+        hintBtn.setEnabled(false);
+        NearlyCompleteBtn.setEnabled(false);
+
+
+        for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) {
+                buttons[r][c].setEnabled(false);
+            }
+        }
+    }
+
+    // Re-enable all buttons (used when hiding solution)
+    public void reEnableAllButtons() {
+        eraseBtn.setEnabled(true);
+        hintBtn.setEnabled(true);
+        NearlyCompleteBtn.setEnabled(true);
+
+        for (int r = 0; r < 9; r++) {
+            for (int c = 0; c < 9; c++) {
+                // only re-enable if it was not originally given
+                if (!boolArr[r][c]) {
+                    buttons[r][c].setEnabled(true);
+                }
+            }
         }
     }
 
     // Check if the game is won
-    public void checkWinCondition() {
+    public boolean checkWinCondition() {
         // Check if all cells are filled correctly
         for (int r = 0; r < 9; r++) {
             for (int c = 0; c < 9; c++) {
                 SButton btn = buttons[r][c];
                 if (btn.displayValue != intArr[r][c]) {
-                    return; // Not yet won
+                    return gameWon = false; // Not yet won
                 }
             }
         }
-        System.out.println("Congratulations! You've completed the Sudoku puzzle!");
-    
-        if (gameTimer != null) {
-            gameTimer.stop(); // Stop the timer upon winning
-            gameOver = true;
-            }
+
+        return gameWon = true;
         }
+
 
     // Provide a hint to the user by filling in one correct cell
    public void giveHint(JButton hintBtn) {

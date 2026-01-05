@@ -1,6 +1,7 @@
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import javax.swing.JOptionPane;
 
 /**
  *
@@ -31,18 +32,33 @@ class SMouseHandler implements MouseListener {
         if (!isFilled) {
             if (game.getCurrentNumber() > 0) {
                 int selectedNum = game.getCurrentNumber();
-                if (selectedNum > 0) button.setDisplayValue(selectedNum);
+                button.setDisplayValue(selectedNum);
 
                 // Check if the move is correct
                 game.checkMove(button.row, button.col, selectedNum);
 
                 // Check if the game is won
-                game.checkWinCondition();
-            }
+                if (game.checkWinCondition()) {
+                    game.gameTimer.stop();
+                    game.disableAllButtons();
+                    game.revealBtn.setEnabled(false);
+                    game.titleMessage.setText("Congratulations! You've completed the puzzle!");
+                    JOptionPane.showMessageDialog(game.frame, "You've completed the puzzle!", "Congratulations", JOptionPane.INFORMATION_MESSAGE);
+}
+                
+            if (game.gameOver) {
+                    game.gameTimer.stop();
+                    game.disableAllButtons();
+                    game.titleMessage.setText("Too many errors! Try again.");
+                    JOptionPane.showMessageDialog(game.frame, "Game Over! Too many errors.", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+                    }
+            
         }
-        // only allow placing numbers in non-default (editable) cells
-        
     }
+}
+
+        
+    
 
     @Override
     public void mouseEntered(MouseEvent me) {
@@ -52,5 +68,5 @@ class SMouseHandler implements MouseListener {
     public void mouseExited(MouseEvent me) {
     }
     
-    
-}
+    }
+

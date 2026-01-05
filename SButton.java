@@ -19,9 +19,9 @@ public class SButton extends JButton{
         this.cellNum = num;
         this.boolValue = boolFlag;
 
-        if (boolFlag) {
+        if (this.boolValue) {
             this.setEnabled(false); //This distinguishes the defaults from the open buttons
-            this.setText(Integer.toString(num));
+            this.setText(Integer.toString(this.cellNum));
             this.setFont(new Font("Verdana", Font.BOLD, 25));
             this.setBackground(CSudokuGame.BG_CELL_GIVEN);
             this.setForeground(CSudokuGame.TEXT_GIVEN);
@@ -53,9 +53,9 @@ public class SButton extends JButton{
     // Update the value shown on this cell (only used for non-given cells)
     public void setDisplayValue(int value) {
             this.displayValue = value;
-            this.setText(value > 0 ? Integer.toString(value) : "");
+            this.setText(value > 0 ? Integer.toString(this.displayValue) : "");
             this.setFont(new Font("Verdana", Font.BOLD, 25));
-            // this.setForeground(TEXT_USER);
+
         }
         
     // Visual cue for which cell is currently selected
@@ -78,6 +78,7 @@ public class SButton extends JButton{
         return col;
     }
 
-
-
+    public int getCellNum() {
+        return cellNum;
+    }
 }

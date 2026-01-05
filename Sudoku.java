@@ -400,6 +400,7 @@ public class Sudoku {
             {2,3,9,8,4,1,5,6,7}
         };
         // Boolean array for which cells are given (true) or empty (false)
+        /*
         boolean[][] given = {
             {true,false,false,false,true,false,false,true,true},
             {false,false,true,false,false,true,false,true,false},
@@ -410,7 +411,27 @@ public class Sudoku {
             {false,true,false,false,false,true,true,false,false},
             {false,false,false,true,false,false,false,true,false},
             {true,true,false,false,true,false,false,false,true}
+        };*/
+
+        boolean[][] given = {
+            {true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true},
+            {true, true, true, true, true, true, true, true, true}
         };
+
+        
+        
+        
+        
+        
+        
+        
         boolean[][] alltrue = new boolean[9][9];
         for (int i = 0; i < 9; i++) {
             for (int j = 0; j < 9; j++) {
