@@ -72,8 +72,8 @@ class CSudokuGame{
 
     public static final Color GRID_BORDER    = Color.decode("#7A4ECF");   // medium purple
 
-    public static final Color PAD_BTN_BG     = Color.decode("#B388FF");   // num button default
-    public static final Color PAD_BTN_BG_SEL = Color.decode("#7C4DFF");   // selected num button
+    public static final Color PAD_BTN_BG     = Color.decode("#5E35B1");   // num button default
+    public static final Color PAD_BTN_BG_SEL = Color.decode("#9a8ebaff");   // selected num button
     public static final Color PAD_BTN_FG     = Color.WHITE;  // white
 
     public static final Color TEXT_GIVEN     = Color.decode("#4A2C82");   // darker purple
@@ -143,7 +143,7 @@ class CSudokuGame{
     public CSudokuGame() {
         // ----- Frame and Panels Setup -----
         // Initialize the main frame
-        JFrame frame = new JFrame("My Sudoku Game");
+        frame = new JFrame("My Sudoku Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(400, 400); // Temporary size
         frame.getContentPane().setBackground(BG_MAIN);
@@ -628,21 +628,25 @@ public void showGameEndDialog(String message, String title) {
     );
 
     // Process the user's choice
-    if (choice == 0) {
-        // Start Over selected
-        System.out.println("Start Over selected");
-        resetGame();
-    } else if (choice == 1) {
-        // Exit selected
-        System.out.println("Exit selected");
-        frame.dispose();  // Close the frame
-        System.exit(0);   // Exit the application
-    } else {
-        // Dialog closed without selection (X button)
-        System.out.println("Dialog closed");
-        // You can treat this as "Exit" if you want
-        frame.dispose();
-        System.exit(0);
+    switch (choice) {
+        case 0 -> {
+            // Start Over selected
+            System.out.println("Start Over selected");
+            resetGame();
+            }
+        case 1 -> {
+            // Exit selected
+            System.out.println("Exit selected");
+            frame.dispose();  // Close the frame
+            System.exit(0);   // Exit the application
+            }
+        default -> {
+            // Dialog closed without selection (X button)
+            System.out.println("Dialog closed");
+            // You can treat this as "Exit" if you want
+            frame.dispose();
+            System.exit(0);
+            }
     }
 }  
 
@@ -656,14 +660,12 @@ public void resetGame() {
     secondsElapsed = 0;
     revealMode = false;
 
-    // solvedBoolArr = boolArrVersion1;
-    // Reset the solvedBoolArr
+    // don't do solvedBoolArr = boolArrVersion1;
+    // Reset the solvedBoolArr by copyng the values from boolArrVersion1
     for (int r = 0; r < 9; r++) {
-        for (int c = 0; c < 9; c++) {
-        solvedBoolArr[r][c] = boolArrVersion1[r][c];  // Copy each value
-        }
+        System.arraycopy(boolArrVersion1[r], 0, solvedBoolArr[r], 0, 9);
     }
-    
+
     // Reset UI labels
     titleMessage.setText("Chibueze's Sudoku Game");
     errorLabel.setText("Errors: 0");
@@ -762,6 +764,5 @@ public static void printStatement (int[][] intList, boolean[][] boolList) {
 }
 
     public static void main(String[] args) {
-        CSudokuGame game = new CSudokuGame();
     }
 }
