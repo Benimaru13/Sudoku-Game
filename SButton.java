@@ -7,7 +7,7 @@ public class SButton extends JButton{
     // Keep the fields public
     int row;
     int col;
-    boolean boolValue;
+    boolean isFixed;
     int cellNum;
     int displayValue;
 
@@ -17,9 +17,9 @@ public class SButton extends JButton{
         this.row = row;
         this.col = col;
         this.cellNum = num;
-        this.boolValue = boolFlag;
+        this.isFixed = boolFlag;
 
-        if (this.boolValue) {
+        if (this.isFixed) {
             this.setEnabled(false); //This distinguishes the defaults from the open buttons
             this.setText(Integer.toString(this.cellNum));
             this.setFont(new Font("Verdana", Font.BOLD, 25));

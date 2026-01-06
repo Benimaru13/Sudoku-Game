@@ -73,7 +73,7 @@ class CSudokuGame{
     public static final Color GRID_BORDER    = Color.decode("#7A4ECF");   // medium purple
 
     public static final Color PAD_BTN_BG     = Color.decode("#5E35B1");   // num button default
-    public static final Color PAD_BTN_BG_SEL = Color.decode("#9a8ebaff");   // selected num button
+    public static final Color PAD_BTN_BG_SEL = Color.decode("#ebdb67");   // selected num button
     public static final Color PAD_BTN_FG     = Color.WHITE;  // white
 
     public static final Color TEXT_GIVEN     = Color.decode("#4A2C82");   // darker purple
@@ -275,7 +275,7 @@ class CSudokuGame{
         numButton.setBackground(PAD_BTN_BG);
         numButton.setForeground(PAD_BTN_FG);
         numButton.setOpaque(true);
-        numButton.setFocusPainted(false);
+        numButton.setFocusPainted(false); // removes focus rectangle around the number button
         numButton.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
         numPanel.add(numButton);
     }
@@ -289,7 +289,7 @@ class CSudokuGame{
         eraseBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
         eraseBtn.addActionListener(e -> {
         // Remove highlight from previously selected number button
-        if (selectedButton != null) {
+        if (selectedButton != null && !selectedButton.isFixed) {
             selectedButton.setSelectedVisual(false);
             selectedButton.setDisplayValue(0); // Clear the cell display
             selectedButton.setBackground(BG_CELL);
@@ -388,6 +388,7 @@ class CSudokuGame{
         frame.add(mainPanel, BorderLayout.CENTER);
         frame.pack();
         frame.setVisible(true);
+        frame.setLocationRelativeTo(null); // center on screen
         startTimer();
 
     }
@@ -476,15 +477,19 @@ class CSudokuGame{
         // remove highlight from previous one
         if (selectedButton != null && selectedButton != btn) {
             selectedButton.setSelectedVisual(false);
-            selectedButton.setBackground(BG_CELL);
+            if (selectedButton.isFixed) {
+                selectedButton.setBackground(BG_CELL_GIVEN);
+            } else {
+                selectedButton.setBackground(BG_CELL);}
             selectedButton.setForeground(TEXT_USER);
-            }
+        }
 
         // highlight new cell
         selectedButton = btn;
         btn.setSelectedVisual(true);
         btn.setBackground(PAD_BTN_BG_SEL);
-        btn.setForeground(PAD_BTN_FG);
+        btn.setForeground(TEXT_USER);
+        // set text color based on correctness
     }
 
     // Check if the user's move is correct
@@ -494,10 +499,12 @@ class CSudokuGame{
         if (value == correct) {
             // Highlight cell in green
             buttons[row][col].setBorder(correctBorder);
+            // buttons[row][col].setForeground(MSG_WIN);
             AudioManager.play("correct");
         } else {
            // highlight cell in red
             buttons[row][col].setBorder(wrongBorder);
+            // buttons[row][col].setForeground(MSG_RED);
             AudioManager.play("wrong");
             
             errorCount++;
@@ -764,5 +771,6 @@ public static void printStatement (int[][] intList, boolean[][] boolList) {
 }
 
     public static void main(String[] args) {
+        CSudokuGame game = new CSudokuGame();
     }
 }
