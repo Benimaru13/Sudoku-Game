@@ -5,6 +5,13 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "type": "java",
+            "name": "CustomButtonsExample",
+            "request": "launch",
+            "mainClass": "CustomButtonsExample",
+            "projectName": "Sudoku-Game_cf0f6ebf"
+        },
+        {
             "type": "jdk",
             "request": "launch",
             "name": "Launch Java App"

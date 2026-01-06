@@ -74,7 +74,7 @@ class CSudokuGame{
 
     public static final Color PAD_BTN_BG     = Color.decode("#B388FF");   // num button default
     public static final Color PAD_BTN_BG_SEL = Color.decode("#7C4DFF");   // selected num button
-    public static final Color PAD_BTN_FG     = GRID_BORDER;  // darker gold/bronze 
+    public static final Color PAD_BTN_FG     = Color.WHITE;  // white
 
     public static final Color TEXT_GIVEN     = Color.decode("#4A2C82");   // darker purple
     public static final Color TEXT_USER      = Color.decode("#5E35B1");   // strong purple
@@ -604,6 +604,36 @@ class CSudokuGame{
     }
 
     checkWinCondition();
+}
+
+public void customDialogButtons() {
+    // Define custom button labels
+    Object[] options = {"Reset", "Exit"};
+
+    // Display the dialog with custom buttons
+    /*
+    int choice = JOptionPane.showOptionDialog(
+        frame,                          // Parent component
+        "You've completed the puzzle!", "Congratulations",
+        JOptionPane.INFORMATION_MESSAGE,
+        JOptionPane.DEFAULT_OPTION,    // Option type
+        JOptionPane.QUESTION_MESSAGE,  // Message type (for the icon)
+        null,                          // Icon (null for default question icon)
+        options,                       // The custom buttons
+        options[0]                     // The initially selected button
+    );
+
+    System.out.println("User selected option index: " + choice);
+
+    // Process the user's choice
+    if (choice == 0) {
+        System.out.println("Reset selected");
+    } else if (choice == 1) {
+        System.out.println("Exit selected");
+    } else {
+        System.out.println("Dialog closed");
+    }
+        */
 }
 
 // ----- Animation Helper Function -----
