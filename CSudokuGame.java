@@ -40,7 +40,7 @@ class CSudokuGame{
     private final JLabel timerLabel;
 
     // Timer variables
-    private int secondsElapsed = 0;
+    public int secondsElapsed = 0;
     public Timer gameTimer;
 
     // Game over flag
@@ -93,7 +93,7 @@ class CSudokuGame{
 
     // Main Sudoku Arrays
     // Sudoku solution array
-    int [][] intArr = {
+    final int [][] intArr = {
         {1, 7, 2, 5, 8, 4, 3, 6, 9}, 
         {9, 3, 5, 6, 2, 7, 8, 1, 4},
         {8, 6, 4, 1, 3, 9, 5, 7, 2},
@@ -108,8 +108,11 @@ class CSudokuGame{
     // Tracks which numbers have been revealed in 
     public static int [][] revealedBtnNumbers = new int[9][9];
 
+    // To track which cells are filled (given) in the version 1 puzzle
+    boolean [][] solvedBoolArr = new boolean[9][9];
+
     // Tracks which cells are filled (given) and which are empty (user-fillable)
-    boolean [][] boolArr = {
+    final boolean [][] boolArrVersion1 = {
         {true, true, true, false, true, true, false, false, false},          
         {false, false, true, false, false, false, true, false, true},
         {false, false, true, false, false, false, false, false, false},
@@ -122,7 +125,7 @@ class CSudokuGame{
     }; 
 
     // Nearly complete puzzle for debugging
-    boolean[][] nearlyCompleted = {
+    final boolean[][] nearlyCompleted = {
         {true, true, true, false, true, true, false, false, false}, 
         {true, true, true, true, true, true, true, true, true},
         {true, true, true, true, true, true, true, true, true},
@@ -216,7 +219,8 @@ class CSudokuGame{
                         // Calculate the actual row and column in the 9x9 grid
                         int rowIndex = gridrow * 3 + r;
                         int colIndex = gridcol * 3 + c;
-                        final boolean isFilled = boolArr[rowIndex][colIndex]; // for use in mouse listener
+                        solvedBoolArr[rowIndex][colIndex] = boolArrVersion1[rowIndex][colIndex];
+                        final boolean isFilled = solvedBoolArr[rowIndex][colIndex]; // for use in mouse listener
                         
                         // Create the button with appropriate parameters
                         SButton button = new SButton(intArr[rowIndex][colIndex], isFilled, rowIndex, colIndex);
@@ -407,7 +411,7 @@ class CSudokuGame{
 
             SButton btn = buttons[r][c];
 
-            if (boolArr[r][c]) {
+            if (solvedBoolArr[r][c]) {
                 // original given cell
                 btn.setDisplayValue(intArr[r][c]);
                 btn.setForeground(TEXT_GIVEN);
@@ -424,10 +428,10 @@ class CSudokuGame{
     public void loadNearlyCompletePuzzle() {
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
-                boolArr[row][col] = nearlyCompleted[row][col];
+                solvedBoolArr[row][col] = nearlyCompleted[row][col];
                 SButton btn = buttons[row][col];
 
-                if (boolArr[row][col]) {
+                if (solvedBoolArr[row][col]) {
                     btn.setDisplayValue(intArr[row][col]);
                     btn.setForeground(TEXT_GIVEN);
                 } else {
@@ -511,7 +515,6 @@ class CSudokuGame{
         hintBtn.setEnabled(false);
         NearlyCompleteBtn.setEnabled(false);
 
-
         for (int r = 0; r < 9; r++) {
             for (int c = 0; c < 9; c++) {
                 buttons[r][c].setEnabled(false);
@@ -528,7 +531,7 @@ class CSudokuGame{
         for (int r = 0; r < 9; r++) {
             for (int c = 0; c < 9; c++) {
                 // only re-enable if it was not originally given
-                if (!boolArr[r][c]) {
+                if (!solvedBoolArr[r][c]) {
                     buttons[r][c].setEnabled(true);
                 }
             }
@@ -566,7 +569,7 @@ class CSudokuGame{
         for (int c = 0; c < 9; c++) {
 
             // only reveal if it was NOT originally given
-            if (!boolArr[r][c]) {              
+            if (!solvedBoolArr[r][c]) {              
                 SButton btn = buttons[r][c];
 
                 // only reveal if it's currently wrong or empty
@@ -606,34 +609,106 @@ class CSudokuGame{
     checkWinCondition();
 }
 
-public void customDialogButtons() {
+
+// Show custom dialog with Start Over and Exit options
+public void showGameEndDialog(String message, String title) {
     // Define custom button labels
-    Object[] options = {"Reset", "Exit"};
+    Object[] options = {"Start Over", "Exit"};
 
     // Display the dialog with custom buttons
-    /*
     int choice = JOptionPane.showOptionDialog(
         frame,                          // Parent component
-        "You've completed the puzzle!", "Congratulations",
-        JOptionPane.INFORMATION_MESSAGE,
-        JOptionPane.DEFAULT_OPTION,    // Option type
-        JOptionPane.QUESTION_MESSAGE,  // Message type (for the icon)
-        null,                          // Icon (null for default question icon)
-        options,                       // The custom buttons
-        options[0]                     // The initially selected button
+        message,                        // Message to display
+        title,                          // Dialog title
+        JOptionPane.DEFAULT_OPTION,     // Option type
+        JOptionPane.INFORMATION_MESSAGE,// Message type
+        null,                           // Icon (null for default)
+        options,                        // The custom buttons
+        options[0]                      // Initially selected button
     );
-
-    System.out.println("User selected option index: " + choice);
 
     // Process the user's choice
     if (choice == 0) {
-        System.out.println("Reset selected");
+        // Start Over selected
+        System.out.println("Start Over selected");
+        resetGame();
     } else if (choice == 1) {
+        // Exit selected
         System.out.println("Exit selected");
+        frame.dispose();  // Close the frame
+        System.exit(0);   // Exit the application
     } else {
+        // Dialog closed without selection (X button)
         System.out.println("Dialog closed");
+        // You can treat this as "Exit" if you want
+        frame.dispose();
+        System.exit(0);
     }
-        */
+}  
+
+// Reset the game to start over
+public void resetGame() {
+    // Reset game state flags
+    gameWon = false;
+    gameOver = false;
+    errorCount = 0;
+    hintsRemaining = 3;
+    secondsElapsed = 0;
+    revealMode = false;
+
+    // solvedBoolArr = boolArrVersion1;
+    // Reset the solvedBoolArr
+    for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+        solvedBoolArr[r][c] = boolArrVersion1[r][c];  // Copy each value
+        }
+    }
+    
+    // Reset UI labels
+    titleMessage.setText("Chibueze's Sudoku Game");
+    errorLabel.setText("Errors: 0");
+    timerLabel.setText("Time: 0:00");
+    hintsLabel.setText("Hints Left: " + hintsRemaining);
+
+        
+    // Re-enable all buttons
+    reEnableAllButtons();
+    revealBtn.setEnabled(true);
+    revealBtn.setText("Reveal Solution");
+
+    // Reset the Sudoku grid
+    for (int r = 0; r < 9; r++) {
+        for (int c = 0; c < 9; c++) {
+            SButton btn = buttons[r][c];
+            revealedBtnNumbers[r][c] = 0;
+            
+            if (solvedBoolArr[r][c]) {
+                // Reset given cells
+                btn.setDisplayValue(intArr[r][c]);
+                btn.setForeground(TEXT_GIVEN);
+                btn.setBorder(defaultBorder);
+            } else {
+                // Clear user cells
+                btn.setDisplayValue(0);
+                btn.setForeground(TEXT_USER);
+                btn.setBorder(defaultBorder);
+                btn.setBackground(BG_CELL);
+            }
+        }
+    }
+    
+    // Reset selected cells
+    selectedButton = null;
+    selectedNumberButton = null;
+    currentNumber = 0;
+    
+    // Restart timer
+    if (gameTimer != null) {
+        gameTimer.stop();
+    }
+    startTimer();
+    
+    System.out.println("Game reset successfully!");
 }
 
 // ----- Animation Helper Function -----

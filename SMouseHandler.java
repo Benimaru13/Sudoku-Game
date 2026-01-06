@@ -1,7 +1,6 @@
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import javax.swing.JOptionPane;
 
 /**
  *
@@ -43,15 +42,21 @@ class SMouseHandler implements MouseListener {
                     game.disableAllButtons();
                     game.revealBtn.setEnabled(false);
                     game.titleMessage.setText("Congratulations! You've completed the puzzle!");
-                    JOptionPane.showMessageDialog(game.frame, "You've completed the puzzle!", "Congratulations", JOptionPane.INFORMATION_MESSAGE);
-}
+                    game.showGameEndDialog(
+                    "You've completed the puzzle in " + formatTime(game.secondsElapsed) + "!", 
+                    "Congratulations!"
+                );
+                }
                 
-            if (game.gameOver) {
+                if (game.gameOver) {
                     game.gameTimer.stop();
                     game.disableAllButtons();
                     game.titleMessage.setText("Too many errors! Try again.");
-                    JOptionPane.showMessageDialog(game.frame, "Game Over! Too many errors.", "Game Over", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                    // Show custom dialog for game over
+                    game.showGameEndDialog(
+                        "Game Over! Too many errors.", 
+                        "Game Over");
+                }
             
         }
     }
@@ -67,6 +72,13 @@ class SMouseHandler implements MouseListener {
     @Override
     public void mouseExited(MouseEvent me) {
     }
+
+    // Helper method to format time in seconds to mm:ss
+    private String formatTime(int seconds) {
+        int minutes = seconds / 60;
+        int secs = seconds % 60;
+        return String.format("%d:%02d", minutes, secs);
+}
     
     }
 
