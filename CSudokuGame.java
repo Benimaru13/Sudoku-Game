@@ -12,9 +12,10 @@ Description: This is a simple Java created Sudoku Game using Swing for GUI.
 
 class CSudokuGame{
     // Important Fields
-    JLabel titleMessage;
     JFrame frame;
-
+    JLabel titleMessage;
+    GridLayout gl;
+    
     // keeps track of the currently selected cell in the puzzle
     SButton selectedButton; 
 
@@ -23,9 +24,6 @@ class CSudokuGame{
 
     // keeps track of the currently selected number button in the number pad
     private SButton selectedNumberButton; 
-
-    // 2D array to hold references to all Sudoku grid buttons
-    SButton[][] buttons = new SButton[9][9];
 
     // True when the Solution reveal button is toggled on
     boolean revealMode = false;
@@ -63,8 +61,10 @@ class CSudokuGame{
     private final JButton NearlyCompleteBtn;
     public final JButton revealBtn;
 
+    // Number Pad Panel
+    public final JPanel numPanel;
 
-    // Purple themed colors
+    // Color Scheme
     public static final Color BG_MAIN        = Color.decode("#F6F0FF");   // very light lavender
     public static final Color BG_BOARD       = Color.decode("#EDE4FF");   // slightly darker
     public static final Color BG_CELL        = Color.decode("#FBF8FF");   // subtle contrast
@@ -89,10 +89,23 @@ class CSudokuGame{
     public static final Border wrongBorder = BorderFactory.createLineBorder(MSG_RED, 3);
     public static final Border selectedBorder = BorderFactory.createLineBorder(Color.BLUE, 3);
     public static final Border defaultBorder = BorderFactory.createLineBorder(Color.BLACK, 1); 
+    public static final Border gridBorder = BorderFactory.createLineBorder(GRID_BORDER, 2);
+    public static final Border titleBorder = BorderFactory.createLineBorder(TITLE_BORDER, 2);
 
 
-    // Main Sudoku Arrays
+    // IMPORTANT SUDOKU ARRAYS    
     // Sudoku solution array
+
+    // Tracks which numbers have been revealed in 
+    public int [][] revealedBtnNumbers = new int[9][9];
+
+    // To track which cells are filled (given) in the version 1 puzzle
+    boolean [][] solvedBoolArr = new boolean[9][9];
+  
+    // 2D array to hold references to all Sudoku grid buttons
+    SButton[][] buttons = new SButton[9][9];
+
+    // The solution grid (fixed)
     final int [][] intArr = {
         {1, 7, 2, 5, 8, 4, 3, 6, 9}, 
         {9, 3, 5, 6, 2, 7, 8, 1, 4},
@@ -104,12 +117,6 @@ class CSudokuGame{
         {2, 1, 3, 9, 4, 5, 7, 8, 6},
         {6, 4, 8, 3, 7, 2, 1, 9, 5}             
     };
-
-    // Tracks which numbers have been revealed in 
-    public static int [][] revealedBtnNumbers = new int[9][9];
-
-    // To track which cells are filled (given) in the version 1 puzzle
-    boolean [][] solvedBoolArr = new boolean[9][9];
 
     // Tracks which cells are filled (given) and which are empty (user-fillable)
     final boolean [][] boolArrVersion1 = {
@@ -136,9 +143,9 @@ class CSudokuGame{
         {true, true, true, true, true, true, true, true, true},    
         {true, true, true, true, true, true, true, true, true}    
     };
-
     
     // Debug feature: printStatement(intArr, boolArr);
+
 
     public CSudokuGame() {
         // ----- Frame and Panels Setup -----
@@ -154,9 +161,11 @@ class CSudokuGame{
         messagePanel.setBorder(BorderFactory.createMatteBorder(0, 0, 2, 0, TITLE_BORDER));
         messagePanel.setLayout(new BorderLayout()); // This allows for top and bottom placement
 
+        // Title Panel 
         JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         titlePanel.setBackground(BG_MAIN);
 
+        // Title Message
         titleMessage =  new JLabel();
         titleMessage.setText("Chibueze's Sudoku Game");
         titleMessage.setForeground(MSG_TEXT);
@@ -196,7 +205,7 @@ class CSudokuGame{
 
         // ----- MAIN GRID PANEL -----
         // Initialize the main Sudoku grid panel
-        GridLayout gl = new GridLayout(rows, cols);
+        gl = new GridLayout(rows, cols);
         JPanel mainPanel = new JPanel(new BorderLayout()); 
         mainPanel.setBackground(BG_MAIN);
 
@@ -204,13 +213,14 @@ class CSudokuGame{
         JPanel gridPanel = new JPanel(gl); 
         gridPanel.setBackground(BG_BOARD);
 
+        // Create the 9x9 Sudoku grid using 3x3 sub-grids
         for (int gridrow = 0; gridrow < 3; gridrow++) {
             for (int gridcol = 0; gridcol < 3; gridcol++) {
 
                 // For each Sudoku main grid, create a sub 3x3 grid 
                 JPanel subPanel = new JPanel(gl);
                 subPanel.setBackground(BG_BOARD);
-                subPanel.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));   
+                subPanel.setBorder(gridBorder);   
 
                 // Create buttons for each cell in the 3x3 sub-grid
                 for (int r = 0; r < 3; r++) {
@@ -239,11 +249,11 @@ class CSudokuGame{
         // Add Side Panel for Number Selection
         JPanel sidePanel = new JPanel();
         sidePanel.setBackground(BG_MAIN);
-        sidePanel.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+        sidePanel.setBorder(gridBorder);
         sidePanel.setLayout(new BorderLayout());
 
         // Number Pad Panel
-        JPanel numPanel = new JPanel(gl);
+        numPanel = new JPanel(gl);
         // Add the numbers 1-9 as buttons
         for (int i = 1; i <= 9; i++) {
             SButton numButton = new SButton(i);
@@ -255,11 +265,7 @@ class CSudokuGame{
             setSelectedNumberButton(numButton); // set the selected number button
                 
         // reset all number button colours
-        for (Component c : numPanel.getComponents()) {
-            if (c instanceof SButton) {
-                c.setBackground(PAD_BTN_BG);
-            }
-        }        
+        resetColor(numPanel, PAD_BTN_BG);
 
         // Highlight the selected number button
         if (selectedNumberButton != null && selectedNumberButton != numButton) {
@@ -276,7 +282,7 @@ class CSudokuGame{
         numButton.setForeground(PAD_BTN_FG);
         numButton.setOpaque(true);
         numButton.setFocusPainted(false); // removes focus rectangle around the number button
-        numButton.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+        numButton.setBorder(gridBorder);
         numPanel.add(numButton);
     }
 
@@ -298,13 +304,16 @@ class CSudokuGame{
 
             System.out.println("Erase mode: no number selected.");
         });
+
+        // eraseBtn design features
         eraseBtn.setBackground(PAD_BTN_BG);
         eraseBtn.setForeground(PAD_BTN_FG);
         eraseBtn.setOpaque(true);
         eraseBtn.setFocusPainted(false);
-        eraseBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+        eraseBtn.setBorder(gridBorder);
 
         controlPanel.add(eraseBtn);
+
 
         // Implement "Hint" button functionality
         hintBtn = new JButton("Hint");
@@ -312,12 +321,13 @@ class CSudokuGame{
         hintBtn.setBackground(PAD_BTN_BG);
         hintBtn.setForeground(PAD_BTN_FG);
         hintBtn.setOpaque(true);
-        hintBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+        hintBtn.setBorder(gridBorder);
         hintBtn.addActionListener(e -> giveHint(hintBtn));
 
         controlPanel.add(hintBtn);
 
         sidePanel.add(controlPanel, BorderLayout.NORTH);
+
 
         // Nearly Complete Button functionality (for debugging)
         NearlyCompleteBtn = new JButton("Nearly Complete (Debug)");
@@ -325,7 +335,7 @@ class CSudokuGame{
         NearlyCompleteBtn.setBackground(PAD_BTN_BG);
         NearlyCompleteBtn.setForeground(PAD_BTN_FG);
         NearlyCompleteBtn.setOpaque(true);
-        NearlyCompleteBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
+        NearlyCompleteBtn.setBorder(gridBorder);
         
         NearlyCompleteBtn.addActionListener(e -> {
         // Load a nearly complete puzzle for debugging
@@ -334,6 +344,7 @@ class CSudokuGame{
 
         controlPanel.add(NearlyCompleteBtn);
 
+
         // Implement "Reveal Solution" button functionality
         revealBtn = new JButton("Reveal Solution");
         revealBtn.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 18));
@@ -341,23 +352,20 @@ class CSudokuGame{
         revealBtn.setForeground(PAD_BTN_FG);
         revealBtn.setOpaque(true);
         revealBtn.setFocusPainted(false);
-        revealBtn.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
-
+        revealBtn.setBorder(gridBorder);
 
         revealBtn.addActionListener(e -> {
             revealMode = !revealMode;   // toggle on/off
 
         if (revealMode) {
             revealBtn.setText("Hide Solution");
-            revealSolution();
-             
+            revealSolution();           
             disableAllButtons();
         } 
         
         else {
             revealBtn.setText("Reveal Solution");
             hideSolution();
-
             reEnableAllButtons();
         }
     });
@@ -366,7 +374,7 @@ class CSudokuGame{
 
 
         // titled border to number pad
-        TitledBorder tBorder = BorderFactory.createTitledBorder(BorderFactory.createLineBorder(TITLE_BORDER, 2), "Choose a Number (from 1-9)");
+        TitledBorder tBorder = BorderFactory.createTitledBorder(titleBorder, "Choose a Number (from 1-9)");
         tBorder.setTitleColor(TEXT_GIVEN);
         numPanel.setBorder(tBorder);
 
@@ -393,6 +401,7 @@ class CSudokuGame{
 
     }
 
+
     // ----- HELPER FUNCTIONS -----
     // Reveal the solution in the grid
     public void revealSolution() {
@@ -401,9 +410,9 @@ class CSudokuGame{
             SButton btn = buttons[r][c];
             btn.setDisplayValue(intArr[r][c]);
             btn.setForeground(MSG_WIN);   // optional: make them look “solution colored”
+            }
         }
     }
-}
 
     // Hide the solution and revert to user inputs
     public void hideSolution() {
@@ -479,6 +488,7 @@ class CSudokuGame{
             selectedButton.setSelectedVisual(false);
             if (selectedButton.isFixed) {
                 selectedButton.setBackground(BG_CELL_GIVEN);
+                selectedButton.setBorder(gridBorder);
             } else {
                 selectedButton.setBackground(BG_CELL);}
             selectedButton.setForeground(TEXT_USER);
@@ -499,12 +509,10 @@ class CSudokuGame{
         if (value == correct) {
             // Highlight cell in green
             buttons[row][col].setBorder(correctBorder);
-            // buttons[row][col].setForeground(MSG_WIN);
             AudioManager.play("correct");
         } else {
            // highlight cell in red
             buttons[row][col].setBorder(wrongBorder);
-            // buttons[row][col].setForeground(MSG_RED);
             AudioManager.play("wrong");
             
             errorCount++;
@@ -598,9 +606,10 @@ class CSudokuGame{
 
     // fill with correct number
     chosenCell.setDisplayValue(intArr[chosenCell.row][chosenCell.col]);
-    chosenCell.setBorder(correctBorder);
+    chosenCell.setBorder(gridBorder);
     chosenCell.setForeground(Color.decode("#4A148C"));   // optional: nice purple tone
 
+    // Play animation to highlight the hinted cell
     flashCell(chosenCell, Color.decode("#39ea8eff"), 2);
 
     // reduce hints
@@ -613,26 +622,43 @@ class CSudokuGame{
         hintBtn.setEnabled(false);
     }
 
+    // Check if the game is won after the hint
     checkWinCondition();
+    if (gameWon) {
+        gameTimer.stop();
+        disableAllButtons();
+        revealBtn.setEnabled(false);
+        titleMessage.setText("Congratulations! You've completed the puzzle!");
+        showGameEndDialog(
+            "You've completed the puzzle in " + formatTime(secondsElapsed) + "!", 
+            "Congratulations!"
+            );
+        }
+    }
+
+        // Helper method to format time in seconds to mm:ss
+    private String formatTime(int seconds) {
+        int minutes = seconds / 60;
+        int secs = seconds % 60;
+        return String.format("%d:%02d", minutes, secs);
 }
 
+    // Show custom dialog with Start Over and Exit options
+    public void showGameEndDialog(String message, String title) {
+        // Define custom button labels
+        Object[] options = {"Start Over", "Exit"};
 
-// Show custom dialog with Start Over and Exit options
-public void showGameEndDialog(String message, String title) {
-    // Define custom button labels
-    Object[] options = {"Start Over", "Exit"};
-
-    // Display the dialog with custom buttons
-    int choice = JOptionPane.showOptionDialog(
-        frame,                          // Parent component
-        message,                        // Message to display
-        title,                          // Dialog title
-        JOptionPane.DEFAULT_OPTION,     // Option type
-        JOptionPane.INFORMATION_MESSAGE,// Message type
-        null,                           // Icon (null for default)
-        options,                        // The custom buttons
-        options[0]                      // Initially selected button
-    );
+        // Display the dialog with custom buttons
+        int choice = JOptionPane.showOptionDialog(
+            frame,                          // Parent component
+            message,                        // Message to display
+            title,                          // Dialog title
+            JOptionPane.DEFAULT_OPTION,     // Option type
+            JOptionPane.INFORMATION_MESSAGE,// Message type
+            null,                           // Icon (null for default)
+            options,                        // The custom buttons
+            options[0]                      // Initially selected button
+        );
 
     // Process the user's choice
     switch (choice) {
@@ -656,6 +682,16 @@ public void showGameEndDialog(String message, String title) {
             }
     }
 }  
+
+    // Method to reset void
+    public void resetColor(JPanel panel, Color color) {
+        // reset all number button colours
+        for (Component c : panel.getComponents()) {
+            if (c instanceof SButton) {
+                c.setBackground(color);
+            }
+        } 
+    }
 
 // Reset the game to start over
 public void resetGame() {
@@ -684,6 +720,14 @@ public void resetGame() {
     reEnableAllButtons();
     revealBtn.setEnabled(true);
     revealBtn.setText("Reveal Solution");
+
+    // Unselect the number button
+    if (selectedNumberButton != null) {
+        selectedNumberButton.setSelectedVisual(false);
+        selectedNumberButton = null;
+        currentNumber = 0;
+        resetColor(numPanel, PAD_BTN_BG);
+    }
 
     // Reset the Sudoku grid
     for (int r = 0; r < 9; r++) {

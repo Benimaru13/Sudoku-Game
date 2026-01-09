@@ -28,6 +28,7 @@ class SMouseHandler implements MouseListener {
 
         if (game.revealMode) return;
 
+        // Only allow number placement if the cell is not already filled
         if (!isFilled) {
             if (game.getCurrentNumber() > 0) {
                 int selectedNum = game.getCurrentNumber();
@@ -48,6 +49,7 @@ class SMouseHandler implements MouseListener {
                 );
                 }
                 
+                // Check if the game is over due to too many errors
                 if (game.gameOver) {
                     game.gameTimer.stop();
                     game.disableAllButtons();

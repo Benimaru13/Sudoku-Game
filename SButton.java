@@ -69,7 +69,7 @@ public class SButton extends JButton{
             }
         }
     
-
+    // Getters that help access private fields
     public int getRow() {      
         return row;
     }
