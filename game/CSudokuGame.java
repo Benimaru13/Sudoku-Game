@@ -405,6 +405,10 @@ class CSudokuGame{
         startTimer();
 
 
+    // Audio Setup
+    AudioManager.load("correct", "/sounds/correct.wav");
+    AudioManager.load("wrong", "/sounds/fahhh.wav");
+    AudioManager.load("clock_ticks", "/sounds/clock_ticks.wav");
     }
 
 
