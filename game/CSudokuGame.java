@@ -1,3 +1,4 @@
+package game;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -21,6 +22,9 @@ class CSudokuGame{
 
     // keeps track of what number the user has selected from 1 to 9
     int currentNumber; 
+
+    // Name of Player
+    String playerName = "Player";
 
     // keeps track of the currently selected number button in the number pad
     private SButton selectedNumberButton; 
@@ -167,7 +171,8 @@ class CSudokuGame{
 
         // Title Message
         titleMessage =  new JLabel();
-        titleMessage.setText("Chibueze's Sudoku Game");
+        String displayMessage = playerName + "'s Sudoku Game";
+        titleMessage.setText(displayMessage);
         titleMessage.setForeground(MSG_TEXT);
 
         Font messageFont = new Font("Roboto", Font.BOLD, 30);
@@ -398,6 +403,7 @@ class CSudokuGame{
         frame.setVisible(true);
         frame.setLocationRelativeTo(null); // center on screen
         startTimer();
+
 
     }
 
@@ -814,7 +820,32 @@ public static void printStatement (int[][] intList, boolean[][] boolList) {
     }
 }
 
+public String requestUserName() {
+     // Define a custom button that asks for user input when clicked
+    String userName = JOptionPane.showInputDialog(null,
+        "Enter your name:", 
+        "User Name",
+        JOptionPane.QUESTION_MESSAGE);
+
+        if (userName != null && !userName.trim().isEmpty()) {
+            // User clicked OK and entered a name
+            System.out.println("Hello, " + userName + "!");
+
+    return userName;
+        } else {
+            // User clicked Cancel or entered an empty name
+            System.out.println("No name entered. Proceeding as 'Player'.");
+            return "Chibueze";
+        }
+}
+
+public void setPlayerName(String name) {
+    this.playerName = name;
+    titleMessage.setText(playerName + "'s Sudoku Game");
+}
+
     public static void main(String[] args) {
         CSudokuGame game = new CSudokuGame();
+        game.setPlayerName(game.requestUserName());
     }
 }
