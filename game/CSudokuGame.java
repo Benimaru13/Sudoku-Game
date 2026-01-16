@@ -4,12 +4,15 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-/*
-Author: Chibueze Benneth
-Class: Computer Science 12
-Date: 1st January 2025
-Description: This is a simple Java created Sudoku Game using Swing for GUI.
-*/
+/**
+ * A complete Sudoku game implementation with GUI using Java Swing.
+ * Features include timer, error tracking, hints system, and solution reveal.
+ * 
+ * @author Chibueze Benneth
+ * @version 1.0
+ * @since 2025-01-01
+ */
+
 
 class CSudokuGame{
     // Important Fields

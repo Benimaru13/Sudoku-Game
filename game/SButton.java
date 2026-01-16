@@ -3,6 +3,13 @@ import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.JButton;
 
+/**
+ * Custom button class representing a single cell in the Sudoku grid
+ * or a button in the number selection pad.
+ * 
+ * @author Chibueze Benneth
+ * @version 1.0
+ */
 
 public class SButton extends JButton{
     // Keep the fields public
@@ -12,6 +19,14 @@ public class SButton extends JButton{
     int cellNum;
     int displayValue;
 
+    /**
+     * Constructs a Sudoku grid cell button.
+     * 
+     * @param num the correct solution number for this cell
+     * @param boolFlag true if this is a pre-filled cell, false if user-editable
+     * @param row the row index (0-8) in the grid
+     * @param col the column index (0-8) in the grid
+     */ 
     
     public SButton(int num, boolean boolFlag, int row, int col) {
         this.setPreferredSize(new Dimension(60, 60));
