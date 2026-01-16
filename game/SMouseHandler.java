@@ -34,6 +34,7 @@ class SMouseHandler implements MouseListener {
             if (game.getCurrentNumber() > 0) {
                 int selectedNum = game.getCurrentNumber();
                 button.setDisplayValue(selectedNum);
+                game.revealedBtnNumbers[button.row][button.col] = selectedNum;game.revealedBtnNumbers[button.row][button.col] = selectedNum;
 
                 // Check if the move is correct
                 game.checkMove(button.row, button.col, selectedNum);

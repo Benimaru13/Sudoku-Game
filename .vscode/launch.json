@@ -8,6 +8,13 @@
             "type": "java",
             "name": "CSudokuGame",
             "request": "launch",
+            "mainClass": "game.CSudokuGame",
+            "projectName": "Sudoku-Game_cf0f6ebf"
+        },
+        {
+            "type": "java",
+            "name": "CSudokuGame",
+            "request": "launch",
             "mainClass": "CSudokuGame",
             "projectName": "Sudoku-Game_cf0f6ebf"
         },

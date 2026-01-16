@@ -440,6 +440,6 @@ public class Sudoku {
         }
         alltrue[0][0] = false; // for testing purposes
         // Start the game
-        new Sudoku(solvedGrid, given);
+       Sudoku Sgame = new Sudoku(solvedGrid, given);
     }
 }
