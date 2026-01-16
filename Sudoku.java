@@ -3,15 +3,34 @@ import java.awt.event.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 
-// Sudoku game class
+/**
+ * Classic Sudoku game implementation with graphical user interface.
+ * Provides a 9x9 grid Sudoku puzzle with interactive cell selection,
+ * number pad input, and visual feedback including cat image reactions
+ * based on game state (correct, incorrect, or winning).
+ * 
+ * Features:
+ * - Interactive 9x9 Sudoku grid
+ * - Number selection pad (1-9)
+ * - Error highlighting with "See Error" toggle
+ * - Number removal with "Remove #" button
+ * - Visual feedback through cat images
+ * - Win condition detection
+ * 
+ * @author Your Team
+ * @version 1.0
+ * @since 2025
+ */
 public class Sudoku {
 
-    // Tracks the currently selected number from the number pad
+    /** The currently selected number from the number pad (1-9, or 0 if none selected) */
     int currentNumber;
-    // 2D array to store references to all grid buttons
+    
+    /** 2D array storing references to all 81 grid buttons in the 9x9 Sudoku board */
     SDKButton[][] buttons = new SDKButton[9][9];
 
-    boolean gameWon = false; // Track if the game is won
+    /** Flag indicating whether the player has won the game */
+    boolean gameWon = false;
     JLabel imageLabel; // Image shown on the right (cat image)
     ImageIcon lockInCatIcon; // default cat image
     ImageIcon incorrectCatIcon; // shown when user places an incorrect number
@@ -47,12 +66,22 @@ public class Sudoku {
     // Border for selected cell
     final Border SELECTED_BORDER = BorderFactory.createLineBorder(PAD_BTN_BG_SEL, 3);
 
-    // Getter for the current number selected by the user
+    /**
+     * Gets the currently selected number from the number pad.
+     * 
+     * @return the current number (1-9), or 0 if no number is selected
+     */
     public int getCurrentNumber() {
         return currentNumber;
     }
 
-    // Constructor to set up the GUI
+    /**
+     * Constructs a Sudoku game with the specified puzzle configuration.
+     * Initializes the GUI including the game board, number pad, and control buttons.
+     * 
+     * @param solvedPuzzle a 9x9 2D array containing the complete solution to the puzzle
+     * @param isGiven a 9x9 boolean array where true indicates pre-filled cells
+     */
     public Sudoku(int[][] solvedPuzzle, boolean[][] isGiven) {
         this.solvedPuzzle = solvedPuzzle; // Store solution
         JFrame frame = new JFrame("Sudoku");
@@ -205,7 +234,12 @@ public class Sudoku {
         frame.setVisible(true);
     }
 
-    // Returns true if there is at least one incorrect (non-empty) number on the board
+    /**
+     * Checks if there are any incorrect numbers placed on the board.
+     * A number is considered incorrect if it's non-empty and doesn't match the solution.
+     * 
+     * @return true if at least one incorrect number is found, false otherwise
+     */
     public boolean hasAnyIncorrect() {
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
@@ -218,7 +252,11 @@ public class Sudoku {
         return false;
     }
 
-    // Updates the cat image based on the current board status
+    /**
+     * Updates the cat image displayed on the right side based on the current board state.
+     * Shows the confused cat if there are incorrect numbers, otherwise shows the encouraging cat.
+     * Does nothing if the game is already won.
+     */
     public void updateCatImage() {
         // just in case win image does not get overwritten
         if (gameWon) return;
@@ -229,7 +267,10 @@ public class Sudoku {
         }
     }
 
-    // Updates cell text colors to show incorrect entries in red when toggled on
+    /**
+     * Updates the highlighting of incorrect numbers based on the "See Error" toggle.
+     * When enabled, displays incorrect numbers in red; otherwise displays them normally.
+     */
     public void updateWrongHighlights() {
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
@@ -249,7 +290,11 @@ public class Sudoku {
         }
     }
 
-    // Method to check if the game is won
+    /**
+     * Checks if the game has been won by verifying all cells match the solution.
+     * 
+     * @return true if all cells match the solution, false otherwise
+     */
     public boolean checkWin() {
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
@@ -261,14 +306,26 @@ public class Sudoku {
         return true;
     }
 
-    // Button class for Sudoku cells
+    /**
+     * Custom button class representing a single cell in the Sudoku grid.
+     * Displays either a pre-filled number (given) or a user-entered number.
+     */
     class SDKButton extends JButton {
-        // Stores the value currently displayed on the button (0 if empty)
+        /** The value currently displayed on the button (0 if the cell is empty) */
         int displayValue;
+        
+        /** True if this is a pre-filled (given) cell that cannot be modified */
         boolean isGiven;
+        
+        /** The default border style for this button */
         Border defaultBorder;
 
-        // Constructor to set up the button
+        /**
+         * Constructs a Sudoku cell button.
+         * 
+         * @param number the value to display in this cell (0 means empty)
+         * @param isGiven true if this is a pre-filled cell, false if user-editable
+         */
         SDKButton(int number, boolean isGiven) {
             this.isGiven = isGiven;
             this.setFont(new Font(Font.SANS_SERIF, Font.BOLD, 28));
@@ -292,14 +349,24 @@ public class Sudoku {
             }
         }
 
-        // Update the value shown on this cell (only used for non-given cells)
+        /**
+         * Updates the value displayed on this cell.
+         * Only used for non-given cells; pre-filled cells cannot be modified.
+         * 
+         * @param value the new value to display (0 to clear the cell)
+         */
         public void setDisplayValue(int value) {
             this.displayValue = value;
             this.setText(value > 0 ? Integer.toString(value) : "");
             this.setForeground(TEXT_USER);
         }
 
-        // Visual cue for which cell is currently selected
+        /**
+         * Sets the visual style of this button to indicate whether it's selected.
+         * Selected cells display with a thick blue border; unselected with a thin border.
+         * 
+         * @param selected true to show selected state, false to show normal state
+         */
         public void setSelectedVisual(boolean selected) {
             if (selected) {
                 this.setBorder(SELECTED_BORDER);
@@ -309,11 +376,19 @@ public class Sudoku {
         }
     }
 
-    // Button class for number pad
+    /**
+     * Custom button class for the number selection pad (1-9).
+     * Displays a number and provides visual feedback when selected.
+     */
     class NumPadButton extends JButton {
+        /** The number displayed by this button (1-9) */
         int number;
 
-        // Constructor to set up the number pad button
+        /**
+         * Constructs a number pad button.
+         * 
+         * @param number the number to display (1-9)
+         */
         NumPadButton(int number) {
             super(Integer.toString(number));
             this.number = number;
@@ -325,16 +400,33 @@ public class Sudoku {
             this.setBorder(BorderFactory.createLineBorder(GRID_BORDER, 2));
         }
 
+        /**
+         * Gets the number represented by this button.
+         * 
+         * @return the number (1-9)
+         */
         public int getNumber() {
             return number;
         }
     }
 
-    // Handles mouse events for each Sudoku cell
+    /**
+     * Handles mouse events for Sudoku cell buttons.
+     * Responds to clicks to select cells and place numbers.
+     */
     class MouseHandler implements MouseListener {
+        /** Reference to the parent Sudoku game */
         Sudoku game;
-        boolean isGiven; // True if this cell is a given (cannot be changed)
+        
+        /** True if this cell is a given (pre-filled and cannot be changed) */
+        boolean isGiven;
 
+        /**
+         * Constructs a mouse handler for a Sudoku cell.
+         * 
+         * @param game reference to the parent Sudoku game
+         * @param isGiven true if this cell is a given (cannot be changed)
+         */
         public MouseHandler(Sudoku game, boolean isGiven) {
             this.game = game;
             this.isGiven = isGiven;
@@ -380,12 +472,26 @@ public class Sudoku {
         @Override public void mouseExited(MouseEvent me) {}
     }
 
-    // Helper to scale icons to a fixed size (prevents zoomed-in images) 
+    /**
+     * Scales an ImageIcon to a specified width and height.
+     * Prevents distorted or overly zoomed images.
+     * 
+     * @param icon the original ImageIcon to scale
+     * @param w the target width in pixels
+     * @param h the target height in pixels
+     * @return a new ImageIcon scaled to the specified dimensions
+     */
     private ImageIcon scaleIcon(ImageIcon icon, int w, int h) {
         Image img = icon.getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
         return new ImageIcon(img);
     }
 
+    /**
+     * Main entry point for the Sudoku game application.
+     * Creates and starts a new game with a predefined puzzle.
+     * 
+     * @param args command-line arguments (unused)
+     */
     public static void main(String[] args) {
         // 9 by 9 grid with solved cells
         int[][] solvedGrid = {

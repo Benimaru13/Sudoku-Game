@@ -1,10 +1,10 @@
-package game;
+package src.game;
 import java.awt.*;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 
-/**
+/** 
  * A complete Sudoku game implementation with GUI using Java Swing.
  * Features include timer, error tracking, hints system, and solution reveal.
  * 
@@ -15,60 +15,76 @@ import javax.swing.border.TitledBorder;
 
 
 class CSudokuGame{
-    // Important Fields
+    /** The main application window */
     JFrame frame;
+    
+    /** Label displaying the game title with player name */
     JLabel titleMessage;
+    
+    /** GridLayout manager for arranging grid components */
     GridLayout gl;
     
-    // keeps track of the currently selected cell in the puzzle
+    /** Reference to the currently selected cell in the puzzle grid */
     SButton selectedButton; 
 
-    // keeps track of what number the user has selected from 1 to 9
+    /** The number currently selected by the player (1-9, or 0 if none selected) */
     int currentNumber; 
 
-    // Name of Player
+    /** The name of the player, displayed in the game title */
     String playerName = "Player";
 
-    // keeps track of the currently selected number button in the number pad
+    /** Reference to the currently highlighted number button in the number pad */
     private SButton selectedNumberButton; 
 
-    // True when the Solution reveal button is toggled on
+    /** True when the solution reveal mode is active */
     boolean revealMode = false;
 
-    // Error count
+    /** Count of errors made by the player (game over at 3 errors) */
     private int errorCount = 0;
 
-    // Error label
+    /** Label displaying the current error count */
     private final JLabel errorLabel;
 
-    // Timer label
+    /** Label displaying the elapsed game time */
     private final JLabel timerLabel;
 
-    // Timer variables
+    /** Total seconds elapsed since game start */
     public int secondsElapsed = 0;
+    
+    /** Timer for tracking elapsed time during gameplay */
     public Timer gameTimer;
 
-    // Game over flag
+    /** True when the player has successfully completed the puzzle */
     public boolean gameWon = false;
+    
+    /** True when the game ends due to too many errors */
     public boolean gameOver = false;
 
-    // Grid dimensions
+    /** Number of rows and columns in the main grid layout (3x3 arrangement of 3x3 sub-grids) */
     final int rows = 3;
+    
+    /** Number of columns in the main grid layout */
     final int cols = 3;
 
-    // number of hints the user can use
+    /** Number of hints remaining for the player to use */
     private int hintsRemaining = 3; 
 
-    // Hints label
+    /** Label displaying remaining hints */
     private final JLabel hintsLabel;
 
-    // Control Buttons
+    /** Button to clear the selected cell */
     private final JButton eraseBtn;
+    
+    /** Button to provide a hint by filling in one empty cell */
     private final JButton hintBtn;
+    
+    /** Debug button to load a nearly complete puzzle */
     private final JButton NearlyCompleteBtn;
+    
+    /** Button to toggle solution reveal mode */
     public final JButton revealBtn;
 
-    // Number Pad Panel
+    /** Panel containing the number selection pad (buttons 1-9) */
     public final JPanel numPanel;
 
     // Color Scheme
@@ -100,19 +116,18 @@ class CSudokuGame{
     public static final Border titleBorder = BorderFactory.createLineBorder(TITLE_BORDER, 2);
 
 
-    // IMPORTANT SUDOKU ARRAYS    
-    // Sudoku solution array
-
-    // Tracks which numbers have been revealed in 
+    // ===== SUDOKU PUZZLE ARRAYS =====
+    
+    /** Stores the user's current entries in each cell of the puzzle */
     public int [][] revealedBtnNumbers = new int[9][9];
 
-    // To track which cells are filled (given) in the version 1 puzzle
+    /** Tracks which cells are pre-filled (given) in the current puzzle version */
     boolean [][] solvedBoolArr = new boolean[9][9];
   
-    // 2D array to hold references to all Sudoku grid buttons
+    /** 2D array holding references to all 81 buttons in the Sudoku grid */
     SButton[][] buttons = new SButton[9][9];
 
-    // The solution grid (fixed)
+    /** The complete solution for the Sudoku puzzle (never modified during gameplay) */
     final int [][] intArr = {
         {1, 7, 2, 5, 8, 4, 3, 6, 9}, 
         {9, 3, 5, 6, 2, 7, 8, 1, 4},
@@ -125,7 +140,7 @@ class CSudokuGame{
         {6, 4, 8, 3, 7, 2, 1, 9, 5}             
     };
 
-    // Tracks which cells are filled (given) and which are empty (user-fillable)
+    /** Configuration for puzzle version 1: true = pre-filled, false = user-fillable */
     final boolean [][] boolArrVersion1 = {
         {true, true, true, false, true, true, false, false, false},          
         {false, false, true, false, false, false, true, false, true},
@@ -138,7 +153,7 @@ class CSudokuGame{
         {false, true, false, false, true, true, false, false, true},       
     }; 
 
-    // Nearly complete puzzle for debugging
+    /** Debug puzzle configuration with almost all cells pre-filled for testing */
     final boolean[][] nearlyCompleted = {
         {true, true, true, false, true, true, false, false, false}, 
         {true, true, true, true, true, true, true, true, true},
@@ -153,7 +168,11 @@ class CSudokuGame{
     
     // Debug feature: printStatement(intArr, boolArr);
 
-
+    /**
+     * Constructs a CSudokuGame instance and initializes the GUI.
+     * Sets up the game board, number pad, control buttons, and starts the timer.
+     * Also loads audio resources needed for gameplay.
+     */
     public CSudokuGame() {
         // ----- Frame and Panels Setup -----
         // Initialize the main frame
@@ -416,7 +435,11 @@ class CSudokuGame{
 
 
     // ----- HELPER FUNCTIONS -----
-    // Reveal the solution in the grid
+    
+    /**
+     * Reveals the complete solution by filling all cells with correct answers.
+     * Used when the "Reveal Solution" button is toggled on.
+     */
     public void revealSolution() {
     for (int r = 0; r < 9; r++) {
         for (int c = 0; c < 9; c++) {
@@ -427,7 +450,10 @@ class CSudokuGame{
         }
     }
 
-    // Hide the solution and revert to user inputs
+    /**
+     * Hides the solution and restores the puzzle to its previous state.
+     * Pre-filled cells show their original values; user cells show user inputs or remain empty.
+     */
     public void hideSolution() {
     for (int r = 0; r < 9; r++) {
         for (int c = 0; c < 9; c++) {
@@ -447,7 +473,10 @@ class CSudokuGame{
         }
     }
 
-    // Load a nearly complete puzzle for debugging
+    /**
+     * Loads a nearly-complete puzzle configuration for debugging.
+     * Fills most cells with correct answers, leaving only a few empty cells.
+     */
     public void loadNearlyCompletePuzzle() {
         for (int row = 0; row < 9; row++) {
             for (int col = 0; col < 9; col++) {
@@ -466,7 +495,10 @@ class CSudokuGame{
     }
 
 
-    // Start the game timer
+    /**
+     * Starts the game timer and begins playing clock-ticking sound.
+     * Increments secondsElapsed every 1000ms and updates the timer display.
+     */
     private void startTimer() {
         gameTimer = new Timer(1000, e -> {
             secondsElapsed++;
@@ -482,19 +514,32 @@ class CSudokuGame{
     }
 
         
-    // Getter for the current number selected by the user
+    /**
+     * Gets the number currently selected by the player.
+     * 
+     * @return the selected number (1-9), or 0 if no number is selected
+     */
     public int getCurrentNumber() {
             return currentNumber;
         }
 
-    // Setter for the selected number button (for visual highlighting)
+    /**
+     * Sets the currently selected number button and updates its visual highlighting.
+     * 
+     * @param btn the button to select (or null to deselect all)
+     */
     public void setSelectedNumberButton(SButton btn) {
         if (selectedNumberButton != null) selectedNumberButton.setSelectedVisual(false);
         selectedNumberButton = btn;
         if (btn != null) btn.setSelectedVisual(true);
     }
 
-    // Setter for the selected cell in the Sudoku grid
+    /**
+     * Sets the currently selected grid cell and updates its visual state.
+     * Removes highlighting from the previous cell and applies it to the new one.
+     * 
+     * @param btn the cell button to select
+     */
     public void setSelectedCell(SButton btn) {
         // remove highlight from previous one
         if (selectedButton != null && selectedButton != btn) {
@@ -515,7 +560,15 @@ class CSudokuGame{
         // set text color based on correctness
     }
 
-    // Check if the user's move is correct
+    /**
+     * Verifies if the user's number placement is correct.
+     * Updates cell border colors (green for correct, red for incorrect),
+     * plays appropriate sounds, and increments error count if needed.
+     * 
+     * @param row the row index of the cell (0-8)
+     * @param col the column index of the cell (0-8)
+     * @param value the number the user entered
+     */
     public void checkMove(int row, int col, int value) {
         int correct = intArr[row][col];
 
@@ -537,7 +590,10 @@ class CSudokuGame{
         }
     }
 
-    // Disable all buttons (used when game is Won)
+    /**
+     * Disables all interactive buttons and grid cells.
+     * Used when the game is won or lost to prevent further input.
+     */
     public void disableAllButtons() {
         eraseBtn.setEnabled(false);
         hintBtn.setEnabled(false);
@@ -550,7 +606,11 @@ class CSudokuGame{
         }
     }
 
-    // Re-enable all buttons (used when hiding solution)
+    /**
+     * Re-enables interactive buttons and user-editable grid cells.
+     * Pre-filled cells remain disabled.
+     * Used when exiting reveal mode or after certain game states.
+     */
     public void reEnableAllButtons() {
         eraseBtn.setEnabled(true);
         hintBtn.setEnabled(true);
@@ -566,7 +626,12 @@ class CSudokuGame{
         }
     }
 
-    // Check if the game is won
+    /**
+     * Checks if the player has successfully completed the puzzle.
+     * Compares all cells against the solution grid.
+     * 
+     * @return true if all cells match the solution, false otherwise
+     */
     public boolean checkWinCondition() {
         // Check if all cells are filled correctly
         for (int r = 0; r < 9; r++) {
@@ -582,7 +647,12 @@ class CSudokuGame{
         }
 
 
-    // Provide a hint to the user by filling in one correct cell
+    /**
+     * Provides a hint to the player by filling in one randomly-selected empty cell with its correct answer.
+     * Decrements hint count, adds 30-second time penalty, and displays animation on the hinted cell.
+     * 
+     * @param hintBtn the hint button (disabled when no hints remain)
+     */
    public void giveHint(JButton hintBtn) {
 
     if (hintsRemaining <= 0) {
@@ -650,13 +720,25 @@ class CSudokuGame{
     }
 
         // Helper method to format time in seconds to mm:ss
+    /**
+     * Formats elapsed time in seconds to a MM:SS string format.
+     * 
+     * @param seconds the number of seconds to format
+     * @return a formatted time string (e.g., \"5:30\" for 5 minutes 30 seconds)
+     */
     private String formatTime(int seconds) {
         int minutes = seconds / 60;
         int secs = seconds % 60;
         return String.format("%d:%02d", minutes, secs);
 }
 
-    // Show custom dialog with Start Over and Exit options
+    /**
+     * Displays a game end dialog with \"Start Over\" and \"Exit\" options.
+     * Handles user choice to restart the game or exit the application.
+     * 
+     * @param message the message to display in the dialog
+     * @param title the title of the dialog window
+     */
     public void showGameEndDialog(String message, String title) {
         // Define custom button labels
         Object[] options = {"Start Over", "Exit"};
@@ -696,7 +778,13 @@ class CSudokuGame{
     }
 }  
 
-    // Method to reset void
+    /**
+     * Resets the background color of all buttons in a panel.
+     * Used to remove highlighting from number buttons.
+     * 
+     * @param panel the panel containing buttons to reset
+     * @param color the color to reset all buttons to
+     */
     public void resetColor(JPanel panel, Color color) {
         // reset all number button colours
         for (Component c : panel.getComponents()) {
@@ -707,6 +795,11 @@ class CSudokuGame{
     }
 
 // Reset the game to start over
+/**
+ * Resets the entire game to its initial state.
+ * Clears all user entries, resets timers, error counts, hints, and re-enables all controls.
+ * Called when the player selects \"Start Over\" after winning or losing.
+ */
 public void resetGame() {
     // Reset game state flags
     gameWon = false;
@@ -778,7 +871,14 @@ public void resetGame() {
 }
 
 // ----- Animation Helper Function -----
-// Flash a cell with a specified color for a number of times
+/**
+ * Animates a cell by flashing it between its original color and a specified color.
+ * Used to draw attention to special events like hints or correct answers.
+ * 
+ * @param cell the button/cell to flash
+ * @param flashColor the color to flash to
+ * @param flashes the number of times to flash (alternates between original and flash color)
+ */
 public void flashCell(JButton cell, Color flashColor, int flashes) {
     final Color original = cell.getBackground();
 
@@ -801,10 +901,16 @@ public void flashCell(JButton cell, Color flashColor, int flashes) {
     });
 
     timer.start();
-}
+    }
 
-// ----- DEBUG FUNCTION -----
-public static void printStatement (int[][] intList, boolean[][] boolList) {
+    /**
+     * Debug helper method to print the puzzle grid to console.
+     * Shows given cells as numbers and empty cells as dots.
+     * 
+     * @param intList the solution array containing all numbers
+     * @param boolList the configuration array indicating which cells are given
+     */
+    public static void printStatement (int[][] intList, boolean[][] boolList) {
     for (int row = 0; row < 9; row++) {
         // This makes the row lines
         for(int spc = 0; spc < 20; spc++){
@@ -827,7 +933,13 @@ public static void printStatement (int[][] intList, boolean[][] boolList) {
     }
 }
 
-public String requestUserName() {
+    /**
+     * Prompts the user to enter their name via a dialog.
+     * Used to personalize the game title.
+     * 
+     * @return the entered name, or \"Chibueze\" as default if cancelled
+     */
+    public String requestUserName() {
      // Define a custom button that asks for user input when clicked
     String userName = JOptionPane.showInputDialog(null,
         "Enter your name:", 
@@ -844,13 +956,24 @@ public String requestUserName() {
             System.out.println("No name entered. Proceeding as 'Player'.");
             return "Chibueze";
         }
-}
+    }
 
-public void setPlayerName(String name) {
+    /**
+     * Sets the player's name and updates the game title label.
+     * 
+     * @param name the player's name to display
+     */
+    public void setPlayerName(String name) {
     this.playerName = name;
     titleMessage.setText(playerName + "'s Sudoku Game");
-}
+    }
 
+    /**
+     * Main entry point for the Sudoku game application.
+     * Creates the game instance and prompts for player name.
+     * 
+     * @param args command-line arguments (unused)
+     */
     public static void main(String[] args) {
         CSudokuGame game = new CSudokuGame();
         game.setPlayerName(game.requestUserName());

@@ -1,4 +1,4 @@
-package game;
+package src.game;
 import java.awt.Dimension;
 import java.awt.Font;
 import javax.swing.JButton;
@@ -12,11 +12,19 @@ import javax.swing.JButton;
  */
 
 public class SButton extends JButton{
-    // Keep the fields public
+    /** Row index (0-8) in the 9x9 grid */
     int row;
+    
+    /** Column index (0-8) in the 9x9 grid */
     int col;
+    
+    /** True if this is a pre-filled (fixed) cell that cannot be modified */
     boolean isFixed;
+    
+    /** The correct solution number for this cell */
     int cellNum;
+    
+    /** The value currently displayed on this cell (0 if empty) */
     int displayValue;
 
     /**
@@ -55,7 +63,12 @@ public class SButton extends JButton{
         }
     }
         
-    // Constructor for number pad buttons
+    /**
+     * Constructs a number pad button (1-9).
+     * Used for the number selection pad, not for grid cells.
+     * 
+     * @param num the number this button represents (1-9)
+     */
     SButton(int num) {
         this.cellNum = num;
             this.setPreferredSize(new Dimension(75, 75));
@@ -66,7 +79,12 @@ public class SButton extends JButton{
             this.setOpaque(true);
          }
     
-    // Update the value shown on this cell (only used for non-given cells)
+    /**
+     * Updates the value displayed on this cell.
+     * Only used for non-fixed cells; pre-filled cells cannot be modified.
+     * 
+     * @param value the new value to display (0 to clear the cell)
+     */
     public void setDisplayValue(int value) {
             this.displayValue = value;
             this.setText(value > 0 ? Integer.toString(this.displayValue) : "");
@@ -74,7 +92,13 @@ public class SButton extends JButton{
 
         }
         
-    // Visual cue for which cell is currently selected
+    /**
+     * Sets the visual style to indicate whether this cell is selected.
+     * Selected cells display with a blue border; unselected with default border.
+     * 
+     * @param selected true to show selected state, false to show normal state
+     */
+    
     public void setSelectedVisual(boolean selected) {
     
             if (selected) {
@@ -85,15 +109,29 @@ public class SButton extends JButton{
             }
         }
     
-    // Getters that help access private fields
+    /**
+     * Gets the row index of this button in the grid.
+     * 
+     * @return the row index (0-8)
+     */
     public int getRow() {      
         return row;
     }
 
+    /**
+     * Gets the column index of this button in the grid.
+     * 
+     * @return the column index (0-8)
+     */
     public int getCol() {
         return col;
     }
 
+    /**
+     * Gets the correct solution number for this cell.
+     * 
+     * @return the cell's solution number
+     */
     public int getCellNum() {
         return cellNum;
     }

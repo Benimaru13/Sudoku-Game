@@ -1,16 +1,29 @@
-package game;
+package src.game;
 
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 
 /**
- *
+ * Handles mouse events for Sudoku grid cells.
+ * Responds to cell clicks to select cells, place numbers, and check game state.
+ * Also manages the hint system and win/loss conditions.
+ * 
  * @author c.benneth
+ * @version 1.0
  */
 class SMouseHandler implements MouseListener {
+    /** Reference to the parent Sudoku game */
     CSudokuGame game;
-    boolean isFilled; // Boolean that ensures that a number is only placed where empty
+    
+    /** True if this cell is pre-filled (cannot be modified) */
+    boolean isFilled;
 
+    /**
+     * Constructs a mouse handler for a Sudoku cell.
+     * 
+     * @param game reference to the parent Sudoku game
+     * @param isFilled true if this cell is pre-filled (cannot be modified)
+     */
     SMouseHandler(CSudokuGame game, boolean isFilled) {
         this.game = game;  
         this.isFilled = isFilled;  
@@ -21,6 +34,12 @@ class SMouseHandler implements MouseListener {
 
     @Override
     public void mousePressed(MouseEvent me) {}
+
+    @Override
+    public void mouseEntered(MouseEvent me) {}
+
+    @Override
+    public void mouseExited(MouseEvent me) {}
 
     @Override
     public void mouseReleased(MouseEvent me) {
@@ -66,18 +85,13 @@ class SMouseHandler implements MouseListener {
     }
 }
 
-        
     
-
-    @Override
-    public void mouseEntered(MouseEvent me) {
-    }
-
-    @Override
-    public void mouseExited(MouseEvent me) {
-    }
-
-    // Helper method to format time in seconds to mm:ss
+    /**
+     * Formats elapsed time in seconds to a mm:ss string format.
+     * 
+     * @param seconds the number of seconds elapsed
+     * @return a formatted time string in mm:ss format
+     */
     private String formatTime(int seconds) {
         int minutes = seconds / 60;
         int secs = seconds % 60;
