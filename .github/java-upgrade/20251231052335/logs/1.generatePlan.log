@@ -1,0 +1,7 @@
+2025-12-31T05:23:35.271Z [INFO] Initializing project configuration...
+2025-12-31T05:23:35.272Z [INFO] Project c:\Users\BC-Tech\Documents\GitHub\Sudoku-Game is not a maven project, try to get java version from gradle
+2025-12-31T05:23:35.298Z [INFO] Try to get java version from gradle config files: 
+2025-12-31T05:23:35.299Z [INFO] Try to get java version from gradle properties: undefined
+2025-12-31T05:23:35.300Z [INFO] Project java version: 8
+2025-12-31T05:23:35.301Z [ERROR] Unsupported project type: undefined. only Maven, Maven Wrapper and Gradle Wrapper project is supported.
+2025-12-31T05:23:35.302Z [ERROR] Failed to prepare project configuration or init upgrade options: Unsupported project type: undefined. only Maven, Maven Wrapper and Gradle Wrapper project is supported. Please choose a valid supported project.

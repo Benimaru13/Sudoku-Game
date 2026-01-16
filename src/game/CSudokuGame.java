@@ -428,9 +428,9 @@ class CSudokuGame{
 
 
     // Audio Setup
-    AudioManager.load("correct", "/sounds/correct.wav");
-    AudioManager.load("wrong", "/sounds/fahhh.wav");
-    AudioManager.load("clock_ticks", "/sounds/clock_ticks.wav");
+    AudioManager.load("correct", "/src/c/sounds/correct.wav");
+    AudioManager.load("wrong", "/src/src/sounds/fahhh.wav");
+    AudioManager.load("clock_ticks", "/src/src/sounds/clock_ticks.wav");
     }
 
 

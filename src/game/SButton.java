@@ -98,6 +98,10 @@ public class SButton extends JButton{
      * 
      * @param selected true to show selected state, false to show normal state
      */
+
+    
+    
+    
     
     public void setSelectedVisual(boolean selected) {
     

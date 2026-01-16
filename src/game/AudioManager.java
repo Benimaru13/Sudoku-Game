@@ -76,6 +76,8 @@ public class AudioManager {
             System.err.println("Audio clip not found: " + key);
             return;
         }
+        if (c.isRunning()) c.stop(); // stop if already playing
+        c.setFramePosition(0); // reset the clip to the beginning
         c.loop(Clip.LOOP_CONTINUOUSLY);
     }
 
