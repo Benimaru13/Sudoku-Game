@@ -1,1 +1,1 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"src.game","l":"AudioManager"},{"p":"src.game","l":"SButton"}];updateSearchResults();
+typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"src.game","l":"AudioManager"},{"p":"src.game","l":"CSudokuGame"},{"p":"src.game","l":"SButton"},{"p":"src.game","l":"SMouseHandler"}];updateSearchResults();

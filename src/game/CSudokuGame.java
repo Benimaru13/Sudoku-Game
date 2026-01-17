@@ -14,7 +14,7 @@ import javax.swing.border.TitledBorder;
  */
 
 
-class CSudokuGame{
+public class CSudokuGame {
     /** The main application window */
     JFrame frame;
     

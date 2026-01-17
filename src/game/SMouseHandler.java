@@ -11,7 +11,7 @@ import java.awt.event.MouseListener;
  * @author c.benneth
  * @version 1.0
  */
-class SMouseHandler implements MouseListener {
+public class SMouseHandler implements MouseListener {
     /** Reference to the parent Sudoku game */
     CSudokuGame game;
     
